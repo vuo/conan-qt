@@ -9,7 +9,7 @@ compiler:
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              brew update
-          && travis_wait brew install --force-bottle conan qbs
+          && travis_wait brew install --force-bottle conan qbs xz
           && sudo ln -s libSystem.B.dylib /usr/lib/libgcc_s.10.4.dylib
       ; fi
 
