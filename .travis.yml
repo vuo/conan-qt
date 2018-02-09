@@ -21,4 +21,4 @@ install:
 
 script:
     - conan create . vuo/stable
-    - conan upload --remote vuo --all --confirm qt/*
+      && conan upload --remote vuo --all --confirm qt/*
