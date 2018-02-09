@@ -64,7 +64,10 @@ class QtConan(ConanFile):
             self.run('make install > /dev/null')
 
     def package(self):
-        self.copy('*', src='%s/lib'     % self.install_dir, links=True, symlinks=True, dst='lib')
-        self.copy('*', src='%s/plugins' % self.install_dir, links=True, symlinks=True, dst='plugins')
-        self.copy('*', src='%s/mkspecs' % self.install_dir, links=True, symlinks=True, dst='mkspecs')
-        self.copy('*', src='%s/bin'     % self.install_dir, links=True, symlinks=True, dst='bin')
+        self.copy('*', src='%s/lib'     % self.install_dir, links=True, dst='lib')
+        # Copy a second time, since the first time it doesn't copy all the framework symlinks.
+        self.copy('*', src='%s/lib'     % self.install_dir, links=True, dst='lib')
+
+        self.copy('*', src='%s/plugins' % self.install_dir, links=True, dst='plugins')
+        self.copy('*', src='%s/mkspecs' % self.install_dir, links=True, dst='mkspecs')
+        self.copy('*', src='%s/bin'     % self.install_dir, links=True, dst='bin')
