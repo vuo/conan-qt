@@ -1,0 +1,78 @@
+diff --git a/src/gui/kernel/qplatformdialoghelper.cpp b/src/gui/kernel/qplatformdialoghelper.cpp
+index f69efe0..1a12b75 100644
+--- a/src/gui/kernel/qplatformdialoghelper.cpp
++++ b/src/gui/kernel/qplatformdialoghelper.cpp
+@@ -396,6 +396,16 @@ void QPlatformColorDialogHelper::setOptions(const QSharedPointer<QColorDialogOpt
+     m_options = options;
+ }
+ 
++void QPlatformColorDialogHelper::setPosition(const QPoint position)
++{
++    m_position = position;
++}
++
++QPoint QPlatformColorDialogHelper::position(void)
++{
++    return m_position;
++}
++
+ // File dialog
+ 
+ class QFileDialogOptionsPrivate : public QSharedData
+diff --git a/src/gui/kernel/qplatformdialoghelper.h b/src/gui/kernel/qplatformdialoghelper.h
+index 936dbdf..7b7d61b 100644
+--- a/src/gui/kernel/qplatformdialoghelper.h
++++ b/src/gui/kernel/qplatformdialoghelper.h
+@@ -46,6 +46,7 @@
+ #include <QtCore/QtGlobal>
+ #include <QtCore/QObject>
+ #include <QtCore/QList>
++#include <QtCore/QPoint>
+ #include <QtCore/QSharedDataPointer>
+ #include <QtCore/QSharedPointer>
+ #include <QtCore/QDir>
+@@ -212,6 +212,8 @@ class Q_GUI_EXPORT QPlatformColorDialogHelper : public QPlatformDialogHelper
+ public:
+     const QSharedPointer<QColorDialogOptions> &options() const;
+     void setOptions(const QSharedPointer<QColorDialogOptions> &options);
++    void setPosition(const QPoint position);
++    QPoint position(void);
+ 
+     virtual void setCurrentColor(const QColor &) = 0;
+     virtual QColor currentColor() const = 0;
+@@ -222,6 +224,7 @@ Q_SIGNALS:
+ 
+ private:
+     QSharedPointer<QColorDialogOptions> m_options;
++    QPoint m_position;
+ };
+ 
+ class Q_GUI_EXPORT QFontDialogOptions
+diff --git a/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm b/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm
+index 41ebd08..04373f7 100644
+--- a/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm
++++ b/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm
+@@ -131,6 +131,8 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSColorPanelDelegate);
+     [mColorPanel setShowsAlpha:mHelper->options()->testOption(QColorDialogOptions::ShowAlphaChannel)];
+     [mColorPanel setFrame:frame display:NO];
+ 
++    [mColorPanel setFrameTopLeftPoint:qt_mac_flipPoint(mHelper->position())];
++
+     if (mHelper->options()->testOption(QColorDialogOptions::NoButtons)) {
+         [self restoreOriginalContentView];
+     } else if (!mStolenContentView) {
+diff --git a/src/widgets/dialogs/qcolordialog.cpp b/src/widgets/dialogs/qcolordialog.cpp
+index 468bffe..dfeca9f 100644
+--- a/src/widgets/dialogs/qcolordialog.cpp
++++ b/src/widgets/dialogs/qcolordialog.cpp
+@@ -1873,8 +1873,9 @@ void QColorDialogPrivate::initHelper(QPlatformDialogHelper *h)
+     static_cast<QPlatformColorDialogHelper *>(h)->setOptions(options);
+ }
+ 
+-void QColorDialogPrivate::helperPrepareShow(QPlatformDialogHelper *)
++void QColorDialogPrivate::helperPrepareShow(QPlatformDialogHelper *h)
+ {
++    static_cast<QPlatformColorDialogHelper *>(h)->setPosition(q_func()->pos());
+     options->setWindowTitle(q_func()->windowTitle());
+ }
+ 

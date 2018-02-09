@@ -1,0 +1,18 @@
+--- src/widgets/kernel/qapplication.cpp.orig	2016-08-13 12:19:02.000000000 -0400
++++ src/widgets/kernel/qapplication.cpp	2016-08-13 12:42:58.000000000 -0400
+@@ -4260,13 +4260,13 @@ void QApplicationPrivate::giveFocusAccor
+     switch (event->type()) {
+         case QEvent::MouseButtonPress:
+         case QEvent::MouseButtonDblClick:
+-        case QEvent::TouchBegin:
++        // case QEvent::TouchBegin:
+             focusedWidgetOnTouchBegin = QApplication::focusWidget();
+             if (setFocusOnRelease)
+                 return;
+             break;
+         case QEvent::MouseButtonRelease:
+-        case QEvent::TouchEnd:
++        // case QEvent::TouchEnd:
+             if (!setFocusOnRelease)
+                 return;
+             if (focusedWidgetOnTouchBegin != QApplication::focusWidget()) {
