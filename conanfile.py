@@ -60,8 +60,8 @@ class QtConan(ConanFile):
                      % (self.source_dir,
                         self.build_folder,
                         self.install_dir))
-            self.run('make -j9')
-            self.run('make install')
+            self.run('make -j9 > /dev/null')
+            self.run('make install > /dev/null')
 
     def package(self):
         self.copy('*', src='%s/lib'     % self.install_dir, links=True, dst='lib')
