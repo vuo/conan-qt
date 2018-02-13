@@ -4,7 +4,7 @@ import os
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.6.3'
-    package_version = '1'
+    package_version = '2'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -52,6 +52,10 @@ class QtConan(ConanFile):
             # https://bugreports.qt.io/browse/QTBUG-59805
             # https://b33p.net/kosada/node/13956
             self.run('patch -p0 < ../../qfiledialog-message.patch')
+
+            # https://b33p.net/kosada/node/10205
+            self.run('patch -p0 < ../../qmenu-checkmark-and-icon.patch')
+            self.run('patch -p0 < ../../qmenu-submenu-arrow-color.patch')
 
     def build(self):
         tools.mkdir(self.build_dir)

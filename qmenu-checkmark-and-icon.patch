@@ -1,0 +1,39 @@
+--- a/src/widgets/styles/qstylesheetstyle.cpp
++++ b/src/widgets/styles/qstylesheetstyle.cpp
+@@ -3691,11 +3691,14 @@ void QStyleSheetStyle::drawControl(ControlElement ce, const QStyleOption *opt, Q
+                         iconRule.geo->height = pixh;
+                     }
+                     QRect iconRect = positionRect(w, subRule, iconRule, PseudoElement_MenuIcon, opt->rect, opt->direction);
++                    if (checkable)
++                        iconRect.setLeft(iconRect.left() + 12);
+                     iconRule.drawRule(p, iconRect);
+                     QRect pmr(0, 0, pixw, pixh);
+                     pmr.moveCenter(iconRect.center());
+                     p->drawPixmap(pmr.topLeft(), pixmap);
+-                } else if (checkable) {
++                }
++                if (checkable) {
+                     QRenderRule subSubRule = renderRule(w, opt, PseudoElement_MenuCheckMark);
+                     if (subSubRule.hasDrawable() || checked) {
+                         QStyleOptionMenuItem newMi = mi;
+@@ -3705,6 +3708,8 @@ void QStyleSheetStyle::drawControl(ControlElement ce, const QStyleOption *opt, Q
+                 }
+ 
+                 QRect textRect = subRule.contentsRect(opt->rect);
++                if (!mi.icon.isNull() && checkable)
++                    textRect.setLeft(textRect.left() + 12);
+                 textRect.setWidth(textRect.width() - mi.tabWidth);
+                 QStringRef s(&mi.text);
+                 p->setPen(mi.palette.buttonText().color());
+@@ -5046,6 +5051,10 @@ QSize QStyleSheetStyle::sizeFromContents(ContentsType ct, const QStyleOption *op
+                 int width = csz.width();
+                 if (mi->text.contains(QLatin1Char('\t')))
+                     width += 12; //as in QCommonStyle
++                bool checkable = mi->checkType != QStyleOptionMenuItem::NotCheckable;
++                bool hasIcon = !mi->icon.isNull();
++                if (checkable && hasIcon)
++                    width += 12;
+                 return subRule.boxSize(subRule.adjustSize(QSize(width, csz.height())));
+             }
+         }
+

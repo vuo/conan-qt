@@ -1,0 +1,11 @@
+--- a/src/widgets/styles/qmacstyle_mac.mm
++++ b/src/widgets/styles/qmacstyle_mac.mm
+@@ -3257,7 +3257,7 @@ AHIG would have (20, 8, 10) here but that makes
+         path.lineTo(4, -3);
+         p->setMatrix(matrix);
+         p->setPen(Qt::NoPen);
+-        p->setBrush(QColor(0, 0, 0, 135));
++        p->setBrush(opt->palette.shadow());
+         p->drawPath(path);
+         p->restore();
+         break; }
