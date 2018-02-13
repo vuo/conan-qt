@@ -5,7 +5,7 @@
                      }
                      QRect iconRect = positionRect(w, subRule, iconRule, PseudoElement_MenuIcon, opt->rect, opt->direction);
 +                    if (checkable)
-+                        iconRect.setLeft(iconRect.left() + 12);
++                        iconRect.moveLeft(iconRect.left() + 24);
                      iconRule.drawRule(p, iconRect);
                      QRect pmr(0, 0, pixw, pixh);
                      pmr.moveCenter(iconRect.center());
@@ -21,7 +21,7 @@
  
                  QRect textRect = subRule.contentsRect(opt->rect);
 +                if (!mi.icon.isNull() && checkable)
-+                    textRect.setLeft(textRect.left() + 12);
++                    textRect.setLeft(textRect.left() + 24);
                  textRect.setWidth(textRect.width() - mi.tabWidth);
                  QStringRef s(&mi.text);
                  p->setPen(mi.palette.buttonText().color());
@@ -32,7 +32,7 @@
 +                bool checkable = mi->checkType != QStyleOptionMenuItem::NotCheckable;
 +                bool hasIcon = !mi->icon.isNull();
 +                if (checkable && hasIcon)
-+                    width += 12;
++                    width += 24;
                  return subRule.boxSize(subRule.adjustSize(QSize(width, csz.height())));
              }
          }
