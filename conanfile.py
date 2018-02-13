@@ -54,8 +54,8 @@ class QtConan(ConanFile):
             self.run('patch -p0 < ../../qfiledialog-message.patch')
 
             # https://b33p.net/kosada/node/10205
-            self.run('patch -p0 < ../../qmenu-checkmark-and-icon.patch')
-            self.run('patch -p0 < ../../qmenu-submenu-arrow-color.patch')
+            self.run('patch -p1 < ../../qmenu-checkmark-and-icon.patch')
+            self.run('patch -p1 < ../../qmenu-submenu-arrow-color.patch')
 
     def build(self):
         tools.mkdir(self.build_dir)
