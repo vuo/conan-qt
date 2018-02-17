@@ -56,6 +56,10 @@ class QtConan(ConanFile):
             # https://b33p.net/kosada/node/10205
             self.run('patch -p1 < ../../qmenu-checkmark-and-icon.patch')
 
+            # https://bugreports.qt.io/browse/QTBUG-57788
+            # https://b33p.net/kosada/node/7384
+            self.run('patch -p1 -R < ../../qcocoaintegration-presentationoptions.patch')
+
     def build(self):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
