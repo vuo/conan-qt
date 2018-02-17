@@ -1,0 +1,46 @@
+From b808c0099ac5880ef06f419c1017146ce40953d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?=
+ <tor.arne.vestbo@theqtcompany.com>
+Date: Wed, 13 Apr 2016 17:09:06 +0200
+Subject: OS X: Fix available geometry at startup when menu bar is hidden
+
+Later versions of OS X allow you to auto-hide the menu bar, which should
+free up 22 pixels vertically at the top of the screen in the available
+geometry. Due to how the NSScreens are invalidated (asynchronously), we
+pick up this geometry change too late, resulting in QWindows maximizing
+as if the menu bar was still there.
+
+To work around this we explicitly tell the system to apply the default
+presentation options before initializing the QScreen properties, which
+results in the NSScreen being invalidated synchronously and having the
+right available geometry.
+
+Change-Id: I40d6ef2211165d53e0825173e3b6c6c17a5a954e
+Reviewed-by: Jake Petroules <jake.petroules@theqtcompany.com>
+---
+ src/plugins/platforms/cocoa/qcocoaintegration.mm | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/plugins/platforms/cocoa/qcocoaintegration.mm b/src/plugins/platforms/cocoa/qcocoaintegration.mm
+index 91d4b2706b..933160b2ca 100644
+--- a/src/plugins/platforms/cocoa/qcocoaintegration.mm
++++ b/src/plugins/platforms/cocoa/qcocoaintegration.mm
+@@ -331,6 +331,15 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
+         [newDelegate setMenuLoader:qtMenuLoader];
+     }
+ 
++    // The presentation options such as whether or not the dock and/or menu bar is
++    // hidden (automatically by the system) affects the main screen's available
++    // geometry. Since we're initializing the screens synchronously at application
++    // startup we need to ensure that the presentation options have been propagated
++    // to the screen before we read out its properties. Normally OS X does this in
++    // an asynchronous callback, but that's too late for us. We force the propagation
++    // by explicitly setting the presentation option to the magic 'default value',
++    // which will resolve to an actual value and result in screen invalidation.
++    cocoaApplication.presentationOptions = NSApplicationPresentationDefault;
+     updateScreens();
+ 
+     QMacInternalPasteboardMime::initializeMimeTypes();
+-- 
+cgit v1.1-6-g87c4
+
