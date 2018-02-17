@@ -4,7 +4,7 @@ import os
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.6.3'
-    package_version = '2'
+    package_version = '3'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
