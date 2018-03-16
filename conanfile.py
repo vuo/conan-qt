@@ -62,7 +62,7 @@ class QtConan(ConanFile):
 
             # https://bugreports.qt.io/browse/QTBUG-46701
             # https://b33p.net/kosada/node/11419
-            self.run('patch -p1 -R < ../../qcocoawindow-fullscreen-close.patch')
+            self.run('patch -p1 < ../../qcocoawindow-fullscreen-close.patch')
 
     def build(self):
         tools.mkdir(self.build_dir)
