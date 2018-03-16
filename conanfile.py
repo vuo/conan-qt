@@ -4,7 +4,7 @@ import os
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.6.3'
-    package_version = '4'
+    package_version = '5'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -59,6 +59,10 @@ class QtConan(ConanFile):
             # https://bugreports.qt.io/browse/QTBUG-57788
             # https://b33p.net/kosada/node/7384
             self.run('patch -p1 -R < ../../qcocoaintegration-presentationoptions.patch')
+
+            # https://bugreports.qt.io/browse/QTBUG-46701
+            # https://b33p.net/kosada/node/11419
+            self.run('patch -p1 -R < ../../qcocoawindow-fullscreen-close.patch')
 
     def build(self):
         tools.mkdir(self.build_dir)

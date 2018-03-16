@@ -1,0 +1,32 @@
+From 92f122de110b52acc0f61a279af5880adaf0458a Mon Sep 17 00:00:00 2001
+From: Eike Ziller <eike.ziller@theqtcompany.com>
+Date: Fri, 26 Jun 2015 15:29:20 +0200
+Subject: [PATCH 1/1] OS X: Fix closing/hiding fullscreen windows leaving empty
+ black spaces
+
+'orderOut' does not remove the fullscreen space, and doesn't make
+another window active. So use 'close' for fullscreen windows.
+
+Task-number: QTBUG-46701
+Change-Id: I9cdac399fe600966f1397a90a95bc6463f236ca5
+---
+ src/plugins/platforms/cocoa/qcocoawindow.mm | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/plugins/platforms/cocoa/qcocoawindow.mm b/src/plugins/platforms/cocoa/qcocoawindow.mm
+index 495d583..4e758f9 100644
+--- a/src/plugins/platforms/cocoa/qcocoawindow.mm
++++ b/src/plugins/platforms/cocoa/qcocoawindow.mm
+@@ -591,6 +591,9 @@ void QCocoaWindow::hide(bool becauseOfAncestor)
+         childWindow->hide(true);
+ 
+     [m_nsWindow orderOut:nil];
++    // if the window is fullscreen, orderOut doesn't close the space and leaves an empty space
++    if ([m_nsWindow styleMask] & NSFullScreenWindowMask)
++        [m_nsWindow close];
+ }
+ 
+ void QCocoaWindow::show(bool becauseOfAncestor)
+-- 
+2.7.4
+
