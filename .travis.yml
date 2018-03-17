@@ -20,5 +20,5 @@ install:
     - conan user
 
 script:
-    - travis_wait conan create . vuo/stable
+    - travis_wait 30 conan create . vuo/stable
       && conan upload --remote vuo --all --confirm qt/*
