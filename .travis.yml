@@ -53,5 +53,6 @@ install:
     - conan user
 
 script:
-    - travis_wait 60 conan create . vuo/stable
+    - travis_wait 60 conan create . vuo/stable 2>&1
+      | egrep -v 'In file included from|warnings? generated|warning: comparison of constant|warning: unused parameter|has been explicitly marked deprecated|warning: .* is deprecated| *(~*)? ?\^ ?~*'
       && conan upload --remote vuo --all --confirm qt/*
