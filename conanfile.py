@@ -1,5 +1,6 @@
 from conans import ConanFile, tools
 import os
+import platform
 
 class QtConan(ConanFile):
     name = 'qt'
@@ -68,12 +69,20 @@ class QtConan(ConanFile):
         self.run('mv %s/LGPL_EXCEPTION.txt %s/%s-lgpl-exception.txt' % (self.source_dir, self.source_dir, self.name))
 
     def build(self):
+        if platform.system() == 'Darwin':
+            platform_flags = '-platform macx-clang -sdk macosx10.11 -no-xcb -no-dbus'
+        elif platform.system() == 'Linux':
+            platform_flags = '-platform linux-clang'
+        else:
+            raise Exception('Unknown platform "%s"' % platform.system())
+
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
-            self.run('../%s/configure -prefix %s/%s -opensource -confirm-license -release -silent -no-ssse3 -no-sse4.1 -no-sse4.2 -no-avx -no-avx2 -no-qml-debug -qt-zlib -qt-libpng -qt-libjpeg -qt-pcre -no-xcb -no-eglfs -no-directfb -no-linuxfb -no-kms -no-glib -strip -no-dbus -nomake examples -no-sql-mysql -no-sql-sqlite -skip 3d -skip activeqt -skip androidextras -skip canvas3d -skip connectivity -skip declarative -skip doc -skip enginio -skip graphicaleffects -skip location -skip multimedia -skip quickcontrols -skip quickcontrols2 -skip sensors -skip serialbus -skip serialport -skip wayland -skip webchannel -skip webengine -skip websockets -skip webview -skip winextras -skip x11extras -skip xmlpatterns -D QT_NO_GESTURES'
+            self.run('../%s/configure -prefix %s/%s -opensource -confirm-license -release -silent %s -no-ssse3 -no-sse4.1 -no-sse4.2 -no-avx -no-avx2 -no-qml-debug -qt-zlib -qt-libpng -qt-libjpeg -qt-pcre -no-eglfs -no-directfb -no-linuxfb -no-kms -no-glib -strip -nomake examples -no-sql-mysql -no-sql-sqlite -skip 3d -skip activeqt -skip androidextras -skip canvas3d -skip connectivity -skip declarative -skip doc -skip enginio -skip graphicaleffects -skip location -skip multimedia -skip quickcontrols -skip quickcontrols2 -skip sensors -skip serialbus -skip serialport -skip wayland -skip webchannel -skip webengine -skip websockets -skip webview -skip winextras -skip x11extras -skip xmlpatterns -D QT_NO_GESTURES'
                      % (self.source_dir,
                         self.build_folder,
-                        self.install_dir))
+                        self.install_dir,
+                        platform_flags))
             self.run('make -j9 > /dev/null')
             self.run('make install > /dev/null')
 
