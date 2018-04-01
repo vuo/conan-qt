@@ -15,6 +15,20 @@ matrix:
                   sources:
                       - sourceline: 'ppa:beineri/opt-qt594-trusty'
                   packages:
+                      - libx11-xcb-dev
+                      - libxcb-glx0-dev
+                      - libxcb-icccm4-dev
+                      - libxcb-image0-dev
+                      - libxcb-keysyms1-dev
+                      - libxcb-randr0-dev
+                      - libxcb-render-util0-dev
+                      - libxcb-shape0-dev
+                      - libxcb-shm0-dev
+                      - libxcb-sync0-dev
+                      - libxcb-xfixes0-dev
+                      - libxcb-xinerama0-dev
+                      - libxcb1-dev
+                      - libxrender-dev
                       - qt59qbs
 
 before_install:
