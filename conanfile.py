@@ -64,6 +64,9 @@ class QtConan(ConanFile):
             # https://b33p.net/kosada/node/11419
             self.run('patch -p1 < ../../qcocoawindow-fullscreen-close.patch')
 
+        self.run('mv %s/LICENSE.LGPLv21 %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
+        self.run('mv %s/LGPL_EXCEPTION.txt %s/%s-lgpl-exception.txt' % (self.source_dir, self.source_dir, self.name))
+
     def build(self):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
@@ -84,3 +87,6 @@ class QtConan(ConanFile):
         self.copy('*', src='%s/bin'     % self.install_dir, links=True, dst='bin')
         self.copy('*', src='%s/phrasebooks'  % self.install_dir, links=True, dst='phrasebooks')
         self.copy('*', src='%s/translations' % self.install_dir, links=True, dst='translations')
+
+        self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
+        self.copy('%s-lgpl-exception.txt' % self.name, src=self.source_dir, dst='license')
