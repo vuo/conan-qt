@@ -1,22 +1,41 @@
-os:
-    - osx
-osx_image: xcode6.4
-
-language: cpp
-compiler:
-    - clang
+matrix:
+    include:
+        - os: osx
+          osx_image: xcode7.3
+          language: cpp
+          compiler:
+              - clang
+        - os: linux
+          dist: trusty
+          sudo: false
+          language: python
+          python: "3.6"
+          addons:
+              apt:
+                  sources:
+                      - sourceline: 'ppa:beineri/opt-qt594-trusty'
+                  packages:
+                      - qt59qbs
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-             brew update > /dev/null
+             brew update &> /dev/null
           && travis_wait brew install --force-bottle conan qbs xz
-          && sudo ln -s libSystem.B.dylib /usr/lib/libgcc_s.10.4.dylib
+          && conan config install https://vuo.org/sites/default/files/conan-macos.zip
+      ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+             pip install conan
+          && conan config install https://vuo.org/sites/default/files/conan-linux.zip
+          && . /opt/qt59/bin/qt59-env.sh
       ; fi
 
 install:
+    - qbs --version
     - qbs setup-qt --detect
     - qbs setup-toolchains --detect
-    - conan config install https://vuo.org/sites/default/files/conan-macos.zip
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+             qbs config defaultProfile clang
+      ; fi
     - conan user
 
 script:

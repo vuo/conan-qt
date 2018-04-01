@@ -40,5 +40,8 @@ class QtTestConan(ConanFile):
             'lib/QtXml.framework/QtXml',
             'plugins/platforms/libqcocoa.dylib',
         ]:
-            self.run('! (otool -L ' + f + ' | tail +3 | egrep -v "^\s*(/usr/lib/|/System/|@rpath/)")')
-            self.run('! (otool -l ' + f + ' | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")')
+            if platform.system() == 'Darwin':
+                self.run('! (otool -L ' + f + ' | tail +3 | egrep -v "^\s*(/usr/lib/|/System/|@rpath/)")')
+                self.run('! (otool -l ' + f + ' | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")')
+            elif platform.system() == 'Linux':
+                self.run('! (ldd ' + f + ' | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")')

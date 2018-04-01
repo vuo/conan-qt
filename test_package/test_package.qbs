@@ -1,6 +1,7 @@
 import qbs 1.0
 
 Project {
+	minimumQbsVersion: '1.6'
 	references: [ buildDirectory + '/../conanbuildinfo.qbs' ]
 	Product {
 		type: 'application'
@@ -20,15 +21,26 @@ Project {
 		}
 		cpp.cxxStandardLibrary: 'libstdc++'
 		cpp.linkerPath: binDirectory + '/clang++'
-		cpp.linkerWrapper: undefined
-		cpp.minimumMacosVersion: '10.10'
-		cpp.frameworkPaths: [ binDirectory + '/../lib' ]
-		cpp.frameworks: [ 'QtCore' ]
-		cpp.rpaths: [ binDirectory + '/../lib' ]
-		cpp.target: 'x86_64-apple-macosx10.10'
+		cpp.rpaths: [ buildDirectory + '/../../lib' ]
 
-		Depends { name: 'xcode' }
-		xcode.sdk: 'macosx10.10'
+		Depends {
+			condition: qbs.targetOS.contains('macos')
+			name: 'xcode'
+		}
+		Properties {
+			condition: qbs.targetOS.contains('macos')
+			cpp.frameworks: [ 'QtCore' ]
+			cpp.linkerWrapper: undefined
+			cpp.minimumMacosVersion: '10.10'
+			cpp.target: 'x86_64-apple-macosx10.10'
+			cpp.stripPath: '/usr/bin/true'
+			xcode.sdk: 'macosx10.11'
+		}
+		Properties {
+			condition: qbs.targetOS.contains('linux')
+			cpp.cxxFlags: [ '-fblocks' ]
+			cpp.target: 'x86_64-unknown-linux-gnu'
+		}
 
 		files: [ 'test_package.cc' ]
 	}
