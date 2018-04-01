@@ -3,7 +3,7 @@ import os
 import shutil
 
 class QtTestConan(ConanFile):
-    requires = 'llvm/3.3-1@vuo/stable'
+    requires = 'llvm/3.3-2@vuo/stable'
     generators = 'qbs'
 
     def build(self):
