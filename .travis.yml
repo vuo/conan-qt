@@ -55,4 +55,4 @@ install:
 script:
     - >
       set -o pipefail ; conan create . vuo/stable 2>&1 | egrep -v --line-buffered 'In file included from|warnings? generated|warning: comparison of constant|warning: unused parameter|has been explicitly marked deprecated|warning: .* is deprecated| *(~*)? ?\^ ?~*'
-      && conan upload --remote vuo --all --confirm qt/*
+    - conan upload --remote vuo --all --confirm qt/*
