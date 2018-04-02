@@ -29,6 +29,7 @@ Project {
 		}
 		Properties {
 			condition: qbs.targetOS.contains('macos')
+			cpp.frameworkPaths: [ binDirectory + '/../lib' ]
 			cpp.frameworks: [ 'QtCore' ]
 			cpp.linkerWrapper: undefined
 			cpp.minimumMacosVersion: '10.10'

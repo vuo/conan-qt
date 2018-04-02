@@ -1,4 +1,9 @@
-#include <QtCore/QtCore>
+#ifdef __linux__
+	#include <QtCore>
+#else
+	#include <QtCore/QtCore>
+#endif
+
 #include <stdio.h>
 
 int main()
