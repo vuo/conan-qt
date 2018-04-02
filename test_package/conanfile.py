@@ -1,5 +1,6 @@
 from conans import ConanFile, tools
 import os
+import platform
 import shutil
 
 class QtTestConan(ConanFile):
