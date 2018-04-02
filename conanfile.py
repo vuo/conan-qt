@@ -5,7 +5,7 @@ import platform
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.6.3'
-    package_version = '6'
+    package_version = '7'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -70,7 +70,9 @@ class QtConan(ConanFile):
 
     def build(self):
         if platform.system() == 'Darwin':
-            platform_flags = '-platform macx-clang -sdk macosx10.11 -no-xcb -no-dbus'
+            # Don't specify `-sdk` here, since that causes qmake to require that SDK on the client system, too.
+            # https://bugreports.qt.io/browse/QTBUG-41238
+            platform_flags = '-platform macx-clang -no-xcb -no-dbus'
         elif platform.system() == 'Linux':
             platform_flags = '-platform linux-clang'
         else:
@@ -96,6 +98,8 @@ class QtConan(ConanFile):
         self.copy('*', src='%s/bin'     % self.install_dir, links=True, dst='bin')
         self.copy('*', src='%s/phrasebooks'  % self.install_dir, links=True, dst='phrasebooks')
         self.copy('*', src='%s/translations' % self.install_dir, links=True, dst='translations')
+
+        self.copy('*', src='%s/include' % self.install_dir, dst='include')
 
         self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
         self.copy('%s-lgpl-exception.txt' % self.name, src=self.source_dir, dst='license')
