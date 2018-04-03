@@ -74,7 +74,7 @@ class QtConan(ConanFile):
             # https://bugreports.qt.io/browse/QTBUG-41238
             platform_flags = '-platform macx-clang -no-xcb -no-dbus'
         elif platform.system() == 'Linux':
-            platform_flags = '-platform linux-clang'
+            platform_flags = '-platform linux-clang -no-icu'
         else:
             raise Exception('Unknown platform "%s"' % platform.system())
 
