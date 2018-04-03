@@ -40,7 +40,7 @@ Project {
 		Properties {
 			condition: qbs.targetOS.contains('linux')
 			cpp.cxxFlags: [ '-fblocks' ]
-			cpp.dynamicLibraries: [ 'QtCore' ]
+			cpp.dynamicLibraries: [ 'Qt5Core' ]
 			cpp.target: 'x86_64-unknown-linux-gnu'
 		}
 
