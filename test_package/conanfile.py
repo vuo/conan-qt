@@ -27,7 +27,11 @@ class QtTestConan(ConanFile):
             self.run('! (otool -L %s | tail +3 | egrep -v "^\s*(/usr/lib/|/System/|@rpath/)")' % dylibPath)
             self.run('! (otool -l %s | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")' % dylibPath)
         elif platform.system() == 'Linux':
-            self.run('! (ldd %s | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")' % dylibPath)
+            env_vars = {
+                'LD_LIBRARY_PATH': '',
+            }
+            with tools.environment_append(env_vars):
+                self.run('! (ldd %s | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")' % dylibPath)
 
     def test(self):
         self.run('qbs run -f "%s"' % self.source_folder)
@@ -37,7 +41,6 @@ class QtTestConan(ConanFile):
             'Concurrent',
             'Core',
             'Gui',
-            'MacExtras',
             'Network',
             'OpenGL',
             'PrintSupport',
@@ -54,6 +57,7 @@ class QtTestConan(ConanFile):
                 self.checkDylib('lib/libQt5%s.so' % f)
 
         if platform.system() == 'Darwin':
+            self.checkDylib('lib/QtMacExtras.framework/QtMacExtras')
             self.checkDylib('plugins/platforms/libqcocoa.dylib')
         elif platform.system() == 'Darwin':
             self.checkDylib('plugins/platforms/libqxcb.so')
