@@ -22,26 +22,38 @@ class QtTestConan(ConanFile):
             shutil.move(src='lib-qt/QtCore.framework', dst='lib/QtCore.framework')
             shutil.rmtree('lib-qt')
 
+    def checkDylib(self, dylibPath):
+        if platform.system() == 'Darwin':
+            self.run('! (otool -L %s | tail +3 | egrep -v "^\s*(/usr/lib/|/System/|@rpath/)")' % dylibPath)
+            self.run('! (otool -l %s | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")' % dylibPath)
+        elif platform.system() == 'Linux':
+            self.run('! (ldd %s | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")' % dylibPath)
+
     def test(self):
         self.run('qbs run -f "%s"' % self.source_folder)
 
         # Ensure we only link to system libraries.
+        for f in [
+            'Concurrent',
+            'Core',
+            'Gui',
+            'MacExtras',
+            'Network',
+            'OpenGL',
+            'PrintSupport',
+            'Script',
+            'Sql',
+            'Svg',
+            'Test',
+            'Widgets',
+            'Xml',
+        ]:
+            if platform.system() == 'Darwin':
+                self.checkDylib('lib/Qt%s.framework/Qt%s' % (f, f))
+            elif platform.system() == 'Linux':
+                self.checkDylib('lib/Qt5%s.so' % (f, f))
+
         if platform.system() == 'Darwin':
-            for f in [
-                'lib/QtConcurrent.framework/QtConcurrent',
-                'lib/QtCore.framework/QtCore',
-                'lib/QtGui.framework/QtGui',
-                'lib/QtMacExtras.framework/QtMacExtras',
-                'lib/QtNetwork.framework/QtNetwork',
-                'lib/QtOpenGL.framework/QtOpenGL',
-                'lib/QtPrintSupport.framework/QtPrintSupport',
-                'lib/QtScript.framework/QtScript',
-                'lib/QtSql.framework/QtSql',
-                'lib/QtSvg.framework/QtSvg',
-                'lib/QtTest.framework/QtTest',
-                'lib/QtWidgets.framework/QtWidgets',
-                'lib/QtXml.framework/QtXml',
-                'plugins/platforms/libqcocoa.dylib',
-            ]:
-                self.run('! (otool -L ' + f + ' | tail +3 | egrep -v "^\s*(/usr/lib/|/System/|@rpath/)")')
-                self.run('! (otool -l ' + f + ' | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")')
+            self.checkDylib('plugins/platforms/libqcocoa.dylib')
+        elif platform.system() == 'Darwin':
+            self.checkDylib('plugins/platforms/libqxcb.so')
