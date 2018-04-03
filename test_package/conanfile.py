@@ -51,7 +51,7 @@ class QtTestConan(ConanFile):
             if platform.system() == 'Darwin':
                 self.checkDylib('lib/Qt%s.framework/Qt%s' % (f, f))
             elif platform.system() == 'Linux':
-                self.checkDylib('lib/Qt5%s.so' % f)
+                self.checkDylib('lib/libQt5%s.so' % f)
 
         if platform.system() == 'Darwin':
             self.checkDylib('plugins/platforms/libqcocoa.dylib')
