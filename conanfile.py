@@ -92,7 +92,7 @@ class QtConan(ConanFile):
                         self.build_folder, # Not a typo — this is the absolute path to the Conan build folder root (not the self.build_dir subfolder).
                         self.install_dir,
                         platform_flags))
-            self.run('make -j9')
+            self.run('make -j9 | tail -n 100')
             self.run('make install > /dev/null')
 
     def package(self):
