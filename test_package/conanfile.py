@@ -53,6 +53,7 @@ class QtTestConan(ConanFile):
             'Widgets',
             'Xml',
         ]:
+            self.output.info('Checking %s...' % f)
             if platform.system() == 'Darwin':
                 self.checkDylib('lib/Qt%s.framework/Qt%s' % (f, f))
             elif platform.system() == 'Linux':
