@@ -4,7 +4,7 @@ import platform
 import shutil
 
 class QtTestConan(ConanFile):
-    requires = 'llvm/3.3-2@vuo/stable'
+    requires = 'llvm/3.3-5@vuo/stable'
     generators = 'qbs'
 
     def build(self):
@@ -25,6 +25,7 @@ class QtTestConan(ConanFile):
     def checkDylib(self, dylibPath):
         if platform.system() == 'Darwin':
             self.run('! (otool -L %s | tail +3 | egrep -v "^\s*(/usr/lib/|/System/|@rpath/)")' % dylibPath)
+            self.run('! (otool -L %s | fgrep "libstdc++")' % dylibPath)
             self.run('! (otool -l %s | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")' % dylibPath)
         elif platform.system() == 'Linux':
             env_vars = {
@@ -32,6 +33,7 @@ class QtTestConan(ConanFile):
             }
             with tools.environment_append(env_vars):
                 self.run('! (ldd %s | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")' % dylibPath)
+                self.run('! (ldd %s | fgrep "libstdc++")' % dylibPath)
 
     def test(self):
         self.run('qbs run -f "%s"' % self.source_folder)
