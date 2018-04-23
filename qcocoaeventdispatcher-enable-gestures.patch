@@ -1,0 +1,17 @@
+--- ./src/plugins/platforms/cocoa/qcocoaeventdispatcher.mm-orig	2018-04-22 21:17:23.000000000 -0400
++++ ./src/plugins/platforms/cocoa/qcocoaeventdispatcher.mm	2018-04-22 21:18:03.000000000 -0400
+@@ -308,14 +308,12 @@ static bool IsMouseOrKeyEvent( NSEvent* 
+         case NSOtherMouseDown:
+         case NSOtherMouseUp:
+         case NSOtherMouseDragged:
+-#ifndef QT_NO_GESTURES
+         case NSEventTypeGesture: // touch events
+         case NSEventTypeMagnify:
+         case NSEventTypeSwipe:
+         case NSEventTypeRotate:
+         case NSEventTypeBeginGesture:
+         case NSEventTypeEndGesture:
+-#endif // QT_NO_GESTURES
+             result    = true;
+         break;
+ 
