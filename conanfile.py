@@ -5,7 +5,7 @@ import platform
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.6.3'
-    package_version = '8'
+    package_version = '9'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -67,6 +67,10 @@ class QtConan(ConanFile):
 
             # https://b33p.net/kosada/node/14521
             self.run('patch -p1 < ../../qcocoaeventdispatcher-enable-gestures.patch')
+
+            # https://bugreports.qt.io/browse/QTBUG-68830
+            # https://b33p.net/kosada/node/14794
+            self.run('patch -p1 < ../../qnsview-drag-mojave.patch')
 
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11',
