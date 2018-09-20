@@ -52,7 +52,6 @@ class QtTestConan(ConanFile):
             'Qml',
             'Quick',
             'QuickWidgets',
-            'Script',
             'Sql',
             'Svg',
             'Test',
