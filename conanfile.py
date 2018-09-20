@@ -111,6 +111,7 @@ class QtConan(ConanFile):
         self.copy('*', src='%s/mkspecs' % self.install_dir, links=True, dst='mkspecs')
         self.copy('*', src='%s/bin'     % self.install_dir, links=True, dst='bin')
         self.copy('*', src='%s/phrasebooks'  % self.install_dir, links=True, dst='phrasebooks')
+        self.copy('*', src='%s/qml'          % self.install_dir, links=True, dst='qml')
         self.copy('*', src='%s/translations' % self.install_dir, links=True, dst='translations')
 
         self.copy('*', src='%s/include' % self.install_dir, dst='include')
