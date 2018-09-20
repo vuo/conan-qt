@@ -94,7 +94,7 @@ class QtConan(ConanFile):
 
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
-            self.run('../%s/configure -prefix %s/%s -opensource -confirm-license -release %s -c++std c++11 -no-ssse3 -no-sse4.1 -no-sse4.2 -no-avx -no-avx2 -no-qml-debug -qt-zlib -qt-libpng -qt-libjpeg -qt-pcre -no-eglfs -no-directfb -no-linuxfb -no-kms -no-glib -strip -nomake examples -no-sql-mysql -no-sql-sqlite -skip 3d -skip activeqt -skip androidextras -skip canvas3d -skip connectivity -skip doc -skip enginio -skip graphicaleffects -skip location -skip multimedia -skip sensors -skip serialbus -skip serialport -skip wayland -skip webchannel -skip webengine -skip websockets -skip webview -skip winextras -skip x11extras -skip xmlpatterns -D QT_NO_GESTURES'
+            self.run('../%s/configure -prefix %s/%s -opensource -confirm-license -release %s -c++std c++11 -no-ssse3 -no-sse4.1 -no-sse4.2 -no-avx -no-avx2 -no-qml-debug -qt-zlib -qt-libpng -qt-libjpeg -qt-pcre -no-eglfs -no-directfb -no-linuxfb -no-kms -no-glib -strip -nomake examples -no-sql-mysql -no-sql-sqlite -skip 3d -skip activeqt -skip androidextras -skip canvas3d -skip connectivity -skip doc -skip enginio -skip graphicaleffects -skip location -skip sensors -skip serialbus -skip serialport -skip wayland -skip webchannel -skip webengine -skip websockets -skip webview -skip winextras -skip x11extras -skip xmlpatterns -D QT_NO_GESTURES'
                      % (self.source_dir,
                         self.build_folder, # Not a typo - this is the absolute path to the Conan build folder root (not the self.build_dir subfolder).
                         self.install_dir,
