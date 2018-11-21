@@ -33,10 +33,24 @@ matrix:
                       - libxrender-dev
                       - qt59qbs
 
+cache:
+    directories:
+        - /usr/local/Cellar/conan
+        - /usr/local/Cellar/gdbm
+        - /usr/local/Cellar/libffi
+        - /usr/local/Cellar/openssl
+        - /usr/local/Cellar/pkg-config
+        - /usr/local/Cellar/python
+        - /usr/local/Cellar/qbs
+        - /usr/local/Cellar/qt
+        - /usr/local/Cellar/readline
+        - /usr/local/Cellar/sqlite
+        - /usr/local/Cellar/xz
+
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              brew update &> /dev/null
-          && travis_wait brew install --force-bottle conan qbs xz
+          && ( [ -d /usr/local/Cellar/conan ] ||  travis_wait brew install --force-bottle conan qbs xz )
           && conan config install https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
