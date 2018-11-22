@@ -49,7 +49,9 @@ cache:
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              brew update &> /dev/null
-          && ( which conan || travis_wait brew install --force-bottle conan qbs xz )
+          && ( brew link conan || travis_wait brew install --force-bottle conan )
+          && ( brew link qbs   || travis_wait brew install --force-bottle qbs )
+          && ( brew link xz    || travis_wait brew install --force-bottle xz )
           && conan config install https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
