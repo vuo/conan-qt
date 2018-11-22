@@ -45,6 +45,7 @@ cache:
         - /usr/local/Cellar/readline
         - /usr/local/Cellar/sqlite
         - /usr/local/Cellar/xz
+        - /usr/local/opt/python
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
