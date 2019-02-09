@@ -30,7 +30,6 @@ matrix:
                       - libxcb-xinerama0-dev
                       - libxcb1-dev
                       - libxrender-dev
-                      - qt59qbs
 
 cache:
     directories:
@@ -40,8 +39,6 @@ cache:
         - /usr/local/Cellar/openssl
         - /usr/local/Cellar/pkg-config
         - /usr/local/Cellar/python
-        - /usr/local/Cellar/qbs
-        - /usr/local/Cellar/qt
         - /usr/local/Cellar/readline
         - /usr/local/Cellar/sqlite
         - /usr/local/Cellar/xz
@@ -51,23 +48,15 @@ cache:
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              ( brew link conan || ( brew update &> /dev/null && travis_wait brew install --force-bottle conan ) )
-          && ( brew link qbs   || ( brew update &> /dev/null && travis_wait brew install --force-bottle qbs   ) )
           && ( brew link xz    || ( brew update &> /dev/null && travis_wait brew install --force-bottle xz    ) )
           && conan config install https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
              pip install conan
           && conan config install https://vuo.org/sites/default/files/conan-linux.zip
-          && . /opt/qt59/bin/qt59-env.sh
       ; fi
 
 install:
-    - qbs --version
-    - qbs setup-qt --detect
-    - qbs setup-toolchains --detect
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-             qbs config defaultProfile clang
-      ; fi
     - conan user
 
 script:
