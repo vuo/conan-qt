@@ -21,19 +21,27 @@ diff --git a/src/plugins/platforms/cocoa/qnsview.mm b/src/plugins/platforms/coco
 index c88ffc76d7a..1c400a1ec97 100644
 --- a/src/plugins/platforms/cocoa/qnsview.mm
 +++ b/src/plugins/platforms/cocoa/qnsview.mm
-@@ -1941,7 +1941,11 @@ static QPoint mapWindowCoordinates(QWindow *source, QWindow *target, QPoint poin
+@@ -1967,20 +1967,6 @@ static QPoint mapWindowCoordinates(QWind
+ 
+     // change the cursor
      [nativeCursor set];
- 
-     // Make sure the cursor is updated correctly if the mouse does not move and window is under cursor
+-
+-    // Make sure the cursor is updated correctly if the mouse does not move and window is under cursor
 -    // by creating a fake move event
-+    // by creating a fake move event, unless on 10.14 and later where doing so will trigger a security
-+    // warning dialog. FIXME: Find a way to update the cursor without fake mouse events.
-+    if ([NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10,14,0}])
-+        return;
-+
-     if (m_updatingDrag)
-         return;
+-    if (m_updatingDrag)
+-        return;
+-
+-    const QPoint mousePos(QCursor::pos());
+-    CGEventRef moveEvent(CGEventCreateMouseEvent(
+-        NULL, kCGEventMouseMoved,
+-        CGPointMake(mousePos.x(), mousePos.y()),
+-        kCGMouseButtonLeft // ignored
+-    ));
+-    CGEventPost(kCGHIDEventTap, moveEvent);
+-    CFRelease(moveEvent);
+ }
  
+ - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 -- 
 2.16.3
 
