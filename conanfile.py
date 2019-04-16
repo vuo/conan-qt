@@ -5,7 +5,7 @@ import platform
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.6.3'
-    package_version = '12'
+    package_version = '13'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
@@ -82,6 +82,11 @@ class QtConan(ConanFile):
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_LFLAGS_CXX11      =',
                                   'QMAKE_LFLAGS_CXX11      = -stdlib=libc++')
+
+            with open('mkspecs/common/clang.conf', 'a') as f:
+                f.write('QMAKE_CFLAGS_RELEASE   = -Oz\n')
+                f.write('QMAKE_CXXFLAGS_RELEASE = -Oz\n')
+                f.write('QMAKE_LFLAGS_RELEASE   = -Oz\n')
 
         self.run('mv %s/LICENSE.LGPLv21 %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/LGPL_EXCEPTION.txt %s/%s-lgpl-exception.txt' % (self.source_dir, self.source_dir, self.name))
