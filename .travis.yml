@@ -49,11 +49,11 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
              ( brew link conan || ( brew update &> /dev/null && travis_wait brew install --force-bottle conan ) )
           && ( brew link xz    || ( brew update &> /dev/null && travis_wait brew install --force-bottle xz    ) )
-          && conan config install https://vuo.org/sites/default/files/conan-macos.zip
+          && conan config install --source-folder vuo-conan https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
              pip install conan
-          && conan config install https://vuo.org/sites/default/files/conan-linux.zip
+          && conan config install --source-folder vuo-conan https://vuo.org/sites/default/files/conan-linux.zip
       ; fi
 
 install:
