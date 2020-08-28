@@ -3,7 +3,7 @@
 @@ -3362,6 +3362,7 @@ bool QApplication::notify(QObject *recei
  
                  QWheelEvent we(relpos, wheel->globalPos(), wheel->pixelDelta(), wheel->angleDelta(), wheel->delta(), wheel->orientation(), wheel->buttons(),
-                                wheel->modifiers(), phase, wheel->source());
+                                wheel->modifiers(), phase, wheel->source(), wheel->inverted());
 +                we.setTimestamp(wheel->timestamp());
                  bool eventAccepted;
                  while (w) {
@@ -16,13 +16,13 @@
                  we.spont = true;
                  we.ignore();
                  d->notify_helper(QApplicationPrivate::wheel_widget, &we);
---- src/widgets/kernel/qwidgetwindow.cpp	2017-10-09 19:58:38.000000000 -0400
-+++ src/widgets/kernel/qwidgetwindow.cpp	2017-10-09 19:57:58.000000000 -0400
-@@ -786,6 +786,7 @@ void QWidgetWindow::handleWheelEvent(QWh
+--- src/widgets/kernel/qwidgetwindow.cpp	2020-07-31 14:37:30.000000000 -0400
++++ src/widgets/kernel/qwidgetwindow.cpp	2020-07-31 14:38:34.000000000 -0400
+@@ -841,6 +841,7 @@ void QWidgetWindow::handleWheelEvent(QWh
      QPoint mapped = widget->mapFrom(rootWidget, pos);
  
-     QWheelEvent translated(mapped, event->globalPos(), event->pixelDelta(), event->angleDelta(), event->delta(), event->orientation(), event->buttons(), event->modifiers(), event->phase(), event->source());
+     QWheelEvent translated(mapped, event->globalPos(), event->pixelDelta(), event->angleDelta(), event->delta(), event->orientation(), event->buttons(), event->modifiers(), event->phase(), event->source(), event->inverted());
 +    translated.setTimestamp(event->timestamp());
-     QGuiApplication::sendSpontaneousEvent(widget, &translated);
+     QGuiApplication::forwardEvent(widget, &translated, event);
  }
  

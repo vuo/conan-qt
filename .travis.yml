@@ -1,9 +1,8 @@
+version: ~> 1.0
 matrix:
     include:
         - os: osx
-          osx_image: xcode7.3
-          language: cpp
-          compiler: clang
+          osx_image: xcode8.3
         - os: linux
           dist: trusty
           sudo: false
@@ -31,25 +30,13 @@ matrix:
                       - libxcb1-dev
                       - libxrender-dev
 
-cache:
-    directories:
-        - /usr/local/Cellar/conan
-        - /usr/local/Cellar/gdbm
-        - /usr/local/Cellar/libffi
-        - /usr/local/Cellar/openssl
-        - /usr/local/Cellar/pkg-config
-        - /usr/local/Cellar/python
-        - /usr/local/Cellar/readline
-        - /usr/local/Cellar/sqlite
-        - /usr/local/Cellar/xz
-        - /usr/local/opt/python
-        - /usr/local/opt/qt
-
 before_install:
+    - export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/3.7/bin
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-             ( brew link conan || ( brew update &> /dev/null && travis_wait brew install --force-bottle conan ) )
-          && ( brew link xz    || ( brew update &> /dev/null && travis_wait brew install --force-bottle xz    ) )
-          && conan config install --source-folder vuo-conan https://vuo.org/sites/default/files/conan-macos.zip
+          curl -OL https://www.python.org/ftp/python/3.7.6/python-3.7.6-macosx10.9.pkg
+          && sudo installer -pkg python-3.7.6-macosx10.9.pkg -target /
+          && pip3 install conan
+          && conan config install https://vuo.org/sites/default/files/conan-macos.zip
       ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
              pip install conan
@@ -63,5 +50,5 @@ script:
     - while sleep 540; do echo "===== 9 minute mark ====="; done &
     - >
       set -o pipefail ; conan create . vuo/stable 2>&1 | egrep -v --line-buffered 'In file included from|warnings? generated|warning: comparison of constant|warning: unused parameter|has been explicitly marked deprecated|warning: .* is deprecated| *(~*)? ?\^ ?~*'
-      && conan upload --remote vuo --all --confirm qt/*
+      && conan upload --remote vuo --all --no-overwrite all --confirm qt/*
     - kill %1

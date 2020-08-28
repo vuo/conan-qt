@@ -1,31 +1,31 @@
---- src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm-orig	2017-12-01 16:34:21.000000000 -0500
-+++ src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm	2017-12-01 16:34:41.000000000 -0500
-@@ -142,7 +142,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSOpenSav
+--- src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm.orig	2020-07-31 13:44:12.000000000 -0400
++++ src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm	2020-07-31 14:14:43.000000000 -0400
+@@ -152,7 +152,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSOpenSav
          mCurrentSelection = new QString(sel.absoluteFilePath());
      }
  
--    [mSavePanel setTitle:QCFString::toNSString(options->windowTitle())];
-+    [mSavePanel setMessage:QCFString::toNSString(options->windowTitle())];
+-    [mSavePanel setTitle:options->windowTitle().toNSString()];
++    [mSavePanel setMessage:options->windowTitle().toNSString()];
      [self createPopUpButton:selectedVisualNameFilter hideDetails:options->testOption(QFileDialogOptions::HideNameFilterDetails)];
      [self createTextField];
      [self createAccessory];
-@@ -421,8 +421,8 @@ static QString strippedText(QString s)
+@@ -443,8 +443,8 @@ static QString strippedText(QString s)
      [mSavePanel setCanCreateDirectories:!(mOptions->testOption(QFileDialogOptions::ReadOnly))];
      [mOpenPanel setAllowsMultipleSelection:(fileMode == QFileDialogOptions::ExistingFiles)];
      [mOpenPanel setResolvesAliases:!(mOptions->testOption(QFileDialogOptions::DontResolveSymlinks))];
--    [mOpenPanel setTitle:QCFString::toNSString(mOptions->windowTitle())];
--    [mSavePanel setTitle:QCFString::toNSString(mOptions->windowTitle())];
-+    [mOpenPanel setMessage:QCFString::toNSString(mOptions->windowTitle())];
-+    [mSavePanel setMessage:QCFString::toNSString(mOptions->windowTitle())];
+-    [mOpenPanel setTitle:mOptions->windowTitle().toNSString()];
+-    [mSavePanel setTitle:mOptions->windowTitle().toNSString()];
++    [mOpenPanel setMessage:mOptions->windowTitle().toNSString()];
++    [mSavePanel setMessage:mOptions->windowTitle().toNSString()];
      [mPopUpButton setHidden:chooseDirsOnly];    // TODO hide the whole sunken pane instead?
  
-     QStringList ext = [self acceptableExtensionsForSave];
-@@ -631,7 +631,7 @@ void QCocoaFileDialogHelper::setFilter()
+     if (mOptions->acceptMode() == QFileDialogOptions::AcceptSave) {
+@@ -655,7 +655,7 @@ void QCocoaFileDialogHelper::setFilter()
      if (!mDelegate)
          return;
      const SharedPointerFileDialogOptions &opts = options();
--    [mDelegate->mSavePanel setTitle:QCFString::toNSString(opts->windowTitle())];
-+    [mDelegate->mSavePanel setMessage:QCFString::toNSString(opts->windowTitle())];
+-    [mDelegate->mSavePanel setTitle:opts->windowTitle().toNSString()];
++    [mDelegate->mSavePanel setMessage:opts->windowTitle().toNSString()];
      if (opts->isLabelExplicitlySet(QFileDialogOptions::Accept))
          [mDelegate->mSavePanel setPrompt:[mDelegate strip:opts->labelText(QFileDialogOptions::Accept)]];
      if (opts->isLabelExplicitlySet(QFileDialogOptions::FileName))

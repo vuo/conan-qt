@@ -4,77 +4,73 @@ import platform
 
 class QtConan(ConanFile):
     name = 'qt'
-    source_version = '5.6.3'
-    package_version = '13'
+    source_version = '5.11.3'
+    package_version = '0'
     version = '%s-%s' % (source_version, package_version)
 
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://qt.io/'
     license = 'http://doc.qt.io/qt-5/opensourcelicense.html'
     description = 'Cross-platform application framework'
-    source_dir = 'qt-everywhere-opensource-src-%s' % source_version
+    source_dir = 'qt-everywhere-src-%s' % source_version
     build_dir = '_build'
     install_dir = '_install'
     exports_sources = '*.patch'
 
     def source(self):
-        # Conan's `tools.get` doesn't yet support xz.
-        # https://github.com/conan-io/conan/issues/52
-        url = 'http://download.qt.io/official_releases/qt/5.6/%s/single/qt-everywhere-opensource-src-%s.tar.xz' % (self.source_version, self.source_version)
-        filename = os.path.basename(url)
-        tools.download(url, filename)
-        tools.check_md5(filename, '010342d515b62ee1c0e709254f4ef9ab')
-        self.run('xz -d "%s"' % filename)
-        filename_tar = os.path.splitext(filename)[0]
-        self.run('tar xf "%s"' % filename_tar)
-        os.unlink(filename_tar)
+        tools.get('http://download.qt.io/new_archive/qt/5.11/%s/single/qt-everywhere-src-%s.tar.xz' % (self.source_version, self.source_version),
+            md5='02b353bfe7a40a8dc4274e1d17226d2b')
 
         with tools.chdir('%s/qtbase' % self.source_dir):
             # https://bugreports.qt.io/browse/QTBUG-26795
+            # Status: merged in Qt 5.12.
             self.run('patch -p1 < ../../qgraphicsscene-device-pixel-ratio.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-44620
-            # https://b33p.net/kosada/node/11273
-            self.run('patch -p1 < ../../qcolordialog-size.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-31406
             # https://b33p.net/kosada/node/6228
             # https://vuo.org/node/111
+            # Status: maybe fixed in Qt 5.12?
             self.run('patch -p1 < ../../qcolordialog-position.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-46351
             # https://b33p.net/kosada/node/12358
+            # Status: unresolved as of 2020.07.31.
             self.run('patch -p0 < ../../qapplication-ignore-touchbegin.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-63681
             # https://b33p.net/kosada/node/13245
+            # Status: merged in Qt 5.12.
             self.run('patch -p0 < ../../qwheelevent-timestamp.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-59805
             # https://b33p.net/kosada/node/13956
+            # Status: unresolved as of 2020.07.31.
             self.run('patch -p0 < ../../qfiledialog-message.patch')
 
             # https://b33p.net/kosada/node/10205
+            # https://bugreports.qt.io/browse/QTBUG-66380
+            # Status: merged in Qt 5.12, but reverted in 5.12.5
+            # since other people want it to hide the checkmark when an icon is present.
+            # The suggested workaround is to render an icon that contains the checkmark,
+            # but that doesn't work for us since Qt scales down the icon to fit within 16x16,
+            # so the checkmark and icon would be too small.
             self.run('patch -p1 < ../../qmenu-checkmark-and-icon.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-57788
             # https://b33p.net/kosada/node/7384
+            # Status: merged in Qt 5.14.
             self.run('patch -p1 -R < ../../qcocoaintegration-presentationoptions.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-46701
-            # https://b33p.net/kosada/node/11419
-            self.run('patch -p1 < ../../qcocoawindow-fullscreen-close.patch')
 
             # https://b33p.net/kosada/node/14521
             self.run('patch -p1 < ../../qcocoaeventdispatcher-enable-gestures.patch')
 
-            # https://bugreports.qt.io/browse/QTBUG-68830
-            # https://b33p.net/kosada/node/14794
-            self.run('patch -p1 < ../../qnsview-drag-mojave.patch')
-
             # https://bugreports.qt.io/browse/QTBUG-69955
             # https://b33p.net/kosada/node/14794
+            # Status: merged in Qt 5.12.
             self.run('patch -p1 < ../../qcoretextfontdatabase-mojave.patch')
+
+            # Enable qsslconfiguration.h to compile with Clang 3.3.
+            self.run('patch -p0 < ../../qsslconfiguration-clang3.patch')
 
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11',
@@ -88,14 +84,20 @@ class QtConan(ConanFile):
                 f.write('QMAKE_CXXFLAGS_RELEASE = -Oz\n')
                 f.write('QMAKE_LFLAGS_RELEASE   = -Oz\n')
 
-        self.run('mv %s/LICENSE.LGPLv21 %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
+        self.run('mv %s/LICENSE.LGPLv3 %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/LGPL_EXCEPTION.txt %s/%s-lgpl-exception.txt' % (self.source_dir, self.source_dir, self.name))
 
     def build(self):
         if platform.system() == 'Darwin':
-            # Don't specify `-sdk` here, since that causes qmake to require that SDK on the client system, too.
-            # https://bugreports.qt.io/browse/QTBUG-41238
-            platform_flags = '-platform macx-clang -no-xcb -no-dbus'
+            # Qt 5.11 requires the macOS 10.12 SDK (it uses new-style enums like `NSEventTypeMouseMoved` and `NSWindowStyleMask`).
+            platform_flags = '\
+                -platform macx-clang \
+                -sdk macosx10.12 \
+                -no-xcb \
+                -no-dbus \
+                -style-mac \
+                -no-style-fusion \
+            '
         elif platform.system() == 'Linux':
             platform_flags = '-platform linux-clang -no-icu'
         else:
@@ -103,7 +105,80 @@ class QtConan(ConanFile):
 
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
-            self.run('../%s/configure -prefix %s/%s -opensource -confirm-license -release %s -c++std c++11 -no-ssse3 -no-sse4.1 -no-sse4.2 -no-avx -no-avx2 -no-qml-debug -qt-zlib -qt-libpng -qt-libjpeg -qt-pcre -no-eglfs -no-directfb -no-linuxfb -no-kms -no-glib -strip -nomake examples -no-sql-mysql -no-sql-sqlite -skip 3d -skip activeqt -skip androidextras -skip canvas3d -skip connectivity -skip doc -skip enginio -skip graphicaleffects -skip location -skip script -skip sensors -skip serialbus -skip serialport -skip wayland -skip webchannel -skip webengine -skip websockets -skip webview -skip winextras -skip x11extras -skip xmlpatterns -D QT_NO_GESTURES'
+            # `-style-windows` is required for Qt Stylesheets.
+            self.run('../%s/configure -prefix %s/%s \
+                -opensource -confirm-license \
+                -release \
+                -optimize-size \
+                -strip \
+                %s \
+                -c++std c++11 \
+                -no-ssse3 \
+                -no-sse4.1 \
+                -no-sse4.2 \
+                -no-avx \
+                -no-avx2 \
+                -no-qml-debug \
+                -style-windows \
+                -system-zlib \
+                -qt-libpng \
+                -qt-libjpeg \
+                -qt-pcre \
+                -no-eglfs \
+                -no-directfb \
+                -no-linuxfb \
+                -no-kms \
+                -no-glib \
+                -nomake examples \
+                -no-sql-mysql \
+                -no-sql-psql \
+                -no-sql-sqlite \
+                -no-freetype \
+                -no-feature-cups \
+                -no-feature-dial \
+                -no-feature-ftp \
+                -no-feature-fontconfig \
+                -no-feature-freetype \
+                -no-feature-imageformat_ppm \
+                -no-feature-imageformat_xbm \
+                -no-feature-lcdnumber \
+                -no-feature-socks5 \
+                -no-feature-statemachine \
+                -no-feature-textodfwriter \
+                -no-feature-udpsocket \
+                -no-feature-tuiotouch \
+                -skip 3d \
+                -skip activeqt \
+                -skip androidextras \
+                -skip canvas3d \
+                -skip charts \
+                -skip connectivity \
+                -skip datavis3d \
+                -skip doc \
+                -skip enginio \
+                -skip gamepad \
+                -skip graphicaleffects \
+                -skip location \
+                -skip networkauth \
+                -skip purchasing \
+                -skip remoteobjects \
+                -skip script \
+                -skip scxml \
+                -skip sensors \
+                -skip serialbus \
+                -skip serialport \
+                -skip speech \
+                -skip virtualkeyboard \
+                -skip wayland \
+                -skip webchannel \
+                -skip webengine \
+                -skip webglplugin \
+                -skip websockets \
+                -skip webview \
+                -skip winextras \
+                -skip x11extras \
+                -skip xmlpatterns \
+                '
                      % (self.source_dir,
                         self.build_folder, # Not a typo - this is the absolute path to the Conan build folder root (not the self.build_dir subfolder).
                         self.install_dir,

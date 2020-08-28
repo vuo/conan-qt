@@ -52,11 +52,19 @@ diff --git a/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm b/src/plugin
 index 41ebd08..04373f7 100644
 --- a/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm
 +++ b/src/plugins/platforms/cocoa/qcocoacolordialoghelper.mm
-@@ -131,6 +131,8 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSColorPanelDelegate);
-     [mColorPanel setShowsAlpha:mHelper->options()->testOption(QColorDialogOptions::ShowAlphaChannel)];
-     [mColorPanel setFrame:frame display:NO];
+@@ -44,6 +44,7 @@
+ #include "qcocoacolordialoghelper.h"
+ #include "qcocoahelpers.h"
+ #include "qcocoaeventdispatcher.h"
++#include "qcocoascreen.h"
  
-+    [mColorPanel setFrameTopLeftPoint:qt_mac_flipPoint(mHelper->position())];
+ #import <AppKit/AppKit.h>
+ 
+@@ -112,6 +113,8 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QNSColorPa
+ {
+     mHelper = helper;
+ 
++    [mColorPanel setFrameTopLeftPoint:QCocoaScreen::mapToNative(mHelper->position())];
 +
      if (mHelper->options()->testOption(QColorDialogOptions::NoButtons)) {
          [self restoreOriginalContentView];

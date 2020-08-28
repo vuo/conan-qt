@@ -1,16 +1,15 @@
-from conans import ConanFile, tools
-import os
+from conans import ConanFile, CMake
 import platform
 import shutil
 
 class QtTestConan(ConanFile):
     requires = 'llvm/3.3-5@vuo/stable'
-    generators = 'qbs'
+    generators = 'cmake'
 
     def build(self):
-        # @todo convert to cmake or whatever
-        # self.run('qbs -f "%s"' % self.source_folder)
-        self.run('true')
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
     def imports(self):
         self.copy('*', src='bin', dst='bin')
@@ -38,26 +37,31 @@ class QtTestConan(ConanFile):
                 self.run('! (ldd %s | fgrep "libstdc++")' % dylibPath)
 
     def test(self):
-        # @todo convert to cmake or whatever
-        # self.run('qbs run -f "%s"' % self.source_folder)
+        self.run('./bin/test_package')
 
         # Ensure we only link to system libraries.
         for f in [
             'Concurrent',
             'Core',
+            'Designer',
+            'DesignerComponents',
             'Gui',
+            'Help',
+            'Multimedia',
+            'MultimediaQuick',
+            'MultimediaWidgets',
             'Network',
             'OpenGL',
-            'Multimedia',
-            'MultimediaQuick_p',
-            'MultimediaWidgets',
             'PrintSupport',
             'Qml',
             'Quick',
+            'QuickParticles',
+            'QuickTest',
             'QuickWidgets',
             'Sql',
             'Svg',
             'Test',
+            'UiPlugin',
             'Widgets',
             'Xml',
         ]:
