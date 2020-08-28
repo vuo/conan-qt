@@ -72,6 +72,11 @@ class QtConan(ConanFile):
             # Enable qsslconfiguration.h to compile with Clang 3.3.
             self.run('patch -p0 < ../../qsslconfiguration-clang3.patch')
 
+            # https://bugreports.qt.io/browse/QTBUG-69204
+            # Status: merged in Qt 5.12.6.
+            self.run('patch -p1 < ../../qstylesheet-repolish-children0.patch')
+            self.run('patch -p1 < ../../qstylesheet-repolish-children1.patch')
+
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11',
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11 -stdlib=libc++')

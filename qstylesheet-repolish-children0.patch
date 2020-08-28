@@ -1,0 +1,72 @@
+From 21dcb96ddca357a6e8ace4b1c7252ec465e77727 Mon Sep 17 00:00:00 2001
+From: Frederik Gladhorn <frederik.gladhorn@qt.io>
+Date: Mon, 15 Oct 2018 16:39:03 +0200
+Subject: [PATCH] QStyleSheetStyle::repolish: only run on direct children
+
+When re-parenting, some widgets change their children. For example
+QLabel, when set to rich text, will not update, until receiving a polish
+call, at which time getting a list of all children recursively and then
+trying to call functions on them will crash, since the children change
+in the middle of this operation.
+
+Fixes: QTBUG-69204
+Fixes: QTBUG-74667
+Change-Id: I95dd83ebeed14c017e22552ddd47658ae8a09353
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+---
+
+diff --git a/src/widgets/styles/qstylesheetstyle.cpp b/src/widgets/styles/qstylesheetstyle.cpp
+index 73b147e..4518d8c 100644
+--- a/src/widgets/styles/qstylesheetstyle.cpp
++++ b/src/widgets/styles/qstylesheetstyle.cpp
+@@ -2905,7 +2905,10 @@
+ 
+ void QStyleSheetStyle::repolish(QWidget *w)
+ {
+-    QList<const QObject *> children = w->findChildren<const QObject *>(QString());
++    QList<const QObject *> children;
++    children.reserve(w->children().size() + 1);
++    for (auto child: qAsConst(w->children()))
++        children.append(child);
+     children.append(w);
+     styleSheetCaches->styleSheetCache.remove(w);
+     updateObjects(children);
+diff --git a/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp b/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
+index 0e5c40f..8760ed0 100644
+--- a/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
++++ b/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
+@@ -48,6 +48,7 @@
+ private slots:
+     void init();
+     void repolish();
++    void repolish_without_crashing();
+     void numinstances();
+     void widgetsBeforeAppStyleSheet();
+     void widgetsAfterAppStyleSheet();
+@@ -367,6 +368,26 @@
+     QCOMPARE(BACKGROUND(p1), APPBACKGROUND(p1));
+ }
+ 
++void tst_QStyleSheetStyle::repolish_without_crashing()
++{
++    // This used to crash, QTBUG-69204
++    QMainWindow w;
++    QScopedPointer<QSplitter> splitter1(new QSplitter(w.centralWidget()));
++    QScopedPointer<QSplitter> splitter2(new QSplitter);
++    QScopedPointer<QSplitter> splitter3(new QSplitter);
++    splitter2->addWidget(splitter3.data());
++
++    splitter2->setStyleSheet("color: red");
++    QScopedPointer<QLabel> label(new QLabel);
++    label->setTextFormat(Qt::RichText);
++    splitter3->addWidget(label.data());
++    label->setText("hey");
++
++    splitter1->addWidget(splitter2.data());
++    w.show();
++    QCOMPARE(COLOR(*label), QColor(Qt::red));
++}
++
+ void tst_QStyleSheetStyle::widgetStyle()
+ {
+     qApp->setStyleSheet("");
