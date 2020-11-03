@@ -1,0 +1,21 @@
+--- src/plugins/platforms/cocoa/qcocoahelpers.h	2020-11-03 09:03:27.000000000 -0500
++++ src/plugins/platforms/cocoa/qcocoahelpers.h	2020-11-03 09:07:13.000000000 -0500
+@@ -246,6 +246,7 @@
+     static_assert(objc_msgsend_requires_stret<ReturnType>::value,
+         "The given return type does not use stret on this platform");
+ 
++#if defined(Q_PROCESSOR_X86)
+     typedef void (*SuperStretFn)(ReturnType *, objc_super *, SEL, Args...);
+     SuperStretFn superStretFn = reinterpret_cast<SuperStretFn>(objc_msgSendSuper_stret);
+ 
+@@ -253,6 +254,10 @@
+     ReturnType ret;
+     superStretFn(&ret, &sup, selector, args...);
+     return ret;
++#elif defined(Q_PROCESSOR_ARM_64)
++    ReturnType ret;
++    return ret;
++#endif
+ }
+ 
+ template<typename... Args>
