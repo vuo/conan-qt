@@ -1,0 +1,10 @@
+build:
+    tags:
+        - macOS
+        - Vuo
+    script:
+        - clang --version | grep clang-1200 || (echo "Please run 'sudo xcode-select --switch /Applications/Xcode-12*.app/Contents/Developer' to activate Xcode 12 (needed for arm64 support)." ; exit 1)
+        - conan config install https://vuo.org/sites/default/files/conan-macos.zip
+        - conan user
+        - conan create . vuo/stable
+        - conan upload --remote vuo --all --no-overwrite all --confirm qt/*
