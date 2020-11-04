@@ -291,6 +291,7 @@ class QtConan(ConanFile):
                     'QtQml',
                     'QtQuick',
                     'QtSvg',
+                    'QtTest',
                     'QtWidgets',
                     'QtXml',
                 ]:
@@ -345,6 +346,8 @@ class QtConan(ConanFile):
         ]:
             self.copy(f, src='%s/bin' % self.install_universal_dir, links=True, dst='bin')
 
+        # qmake is needed by Qt5CoreConfig.cmake..?
+        self.copy('qmake', src='%s/bin' % self.install_x86_dir, links=True, dst='bin')
 
         self.copy('*', src='%s/lib'     % self.install_universal_dir, links=True, dst='lib')
         # Copy a second time, since the first time it doesn't copy all the framework symlinks.
