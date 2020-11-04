@@ -3,8 +3,11 @@ import platform
 import shutil
 
 class QtTestConan(ConanFile):
-    requires = 'llvm/3.3-6@vuo/stable'
     generators = 'cmake'
+    requires = (
+        'llvm/5.0.2-1@vuo/stable',
+        'macos-sdk/11.0-0@vuo/stable',
+    )
 
     def build(self):
         cmake = CMake(self)
@@ -41,12 +44,8 @@ class QtTestConan(ConanFile):
 
         # Ensure we only link to system libraries.
         for f in [
-            'Concurrent',
             'Core',
-            'Designer',
-            'DesignerComponents',
             'Gui',
-            'Help',
             'Multimedia',
             'MultimediaQuick',
             'MultimediaWidgets',
@@ -55,13 +54,7 @@ class QtTestConan(ConanFile):
             'PrintSupport',
             'Qml',
             'Quick',
-            'QuickParticles',
-            'QuickTest',
-            'QuickWidgets',
-            'Sql',
             'Svg',
-            'Test',
-            'UiPlugin',
             'Widgets',
             'Xml',
         ]:

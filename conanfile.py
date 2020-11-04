@@ -277,6 +277,7 @@ class QtConan(ConanFile):
 
             tools.mkdir('lib')
             with tools.chdir('lib'):
+                self.run('cp -a ../../%s/lib/cmake .' % self.install_x86_dir)
                 for f in [
                     'QtCore',
                     'QtGui',
