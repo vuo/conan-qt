@@ -1,4 +1,6 @@
 build:
+    only:
+        - tags
     tags:
         - macOS
         - Vuo
