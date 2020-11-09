@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '2'
+    package_version = '3'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -301,40 +301,12 @@ class QtConan(ConanFile):
                         self.install_arm_dir, f, f,
                         f, f))
 
-            tools.mkdir('plugins')
-            with tools.chdir('plugins'):
-                for d in [
-                    'audio',
-                    'bearer',
-                    'iconengines',
-                    'imageformats',
-                    'mediaservice',
-                    'platforms',
-                    'playlistformats',
-                    'printsupport',
-                    'styles',
-                ]:
-                    tools.mkdir(d)
-                    with tools.chdir(d):
-                        self.run('for i in ../../../%s/plugins/%s/*.dylib ; do \
-                                lipo -create $i ../../../%s/plugins/%s/$(basename $i) -output $(basename $i); \
-                            done' % (
-                                self.install_x86_dir, d,
-                                self.install_arm_dir, d))
-
-            self.run('cp -a ../%s/qml .' % self.install_x86_dir)
-            with tools.chdir('qml/Qt/labs'):
-                for d in [
-                    'handlers',
-                    'settings',
-                    'sharedimage',
-                ]:
-                    with tools.chdir(d):
-                        self.run('for i in ../../../../../%s/qml/Qt/labs/%s/*.dylib ; do \
-                                lipo -create $i ../../../../../%s/qml/Qt/labs/%s/$(basename $i) -output $(basename $i); \
-                            done' % (
-                                self.install_x86_dir, d,
-                                self.install_arm_dir, d))
+            self.run('cp -a ../%s/plugins ../%s/qml .' % (self.install_x86_dir, self.install_x86_dir))
+            for dirpath, dirnames, files in os.walk('.'):
+                for name in files:
+                    if name.endswith('.dylib') and name != 'libqquickwidget.dylib':
+                        path = os.path.join(dirpath, name)
+                        self.run('lipo -create ../%s/%s ../%s/%s -output %s' % (self.install_x86_dir, path, self.install_arm_dir, path, path))
 
         for f in [
             'moc',
