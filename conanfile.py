@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '3'
+    package_version = '4'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -268,12 +268,14 @@ class QtConan(ConanFile):
                     'uic',
                 ]:
                     self.run('lipo -create ../../%s/bin/%s ../../%s/qtbase/bin/%s -output %s' % (self.install_x86_dir, f, self.build_arm_tools_dir, f, f))
+                    self.run('codesign --sign - %s' % f)
                 for f in [
                     'lconvert',
                     'lrelease',
                     'lupdate',
                 ]:
                     self.run('lipo -create ../../%s/bin/%s ../../%s/qttools/bin/%s -output %s' % (self.install_x86_dir, f, self.build_arm_tools_dir, f, f))
+                    self.run('codesign --sign - %s' % f)
 
             tools.mkdir('lib')
             with tools.chdir('lib'):
@@ -300,6 +302,7 @@ class QtConan(ConanFile):
                         self.install_x86_dir, f, f,
                         self.install_arm_dir, f, f,
                         f, f))
+                    self.run('codesign --sign - %s.framework/Versions/5/%s' % (f, f))
 
             self.run('cp -a ../%s/plugins ../%s/qml .' % (self.install_x86_dir, self.install_x86_dir))
             for dirpath, dirnames, files in os.walk('.'):
@@ -307,6 +310,7 @@ class QtConan(ConanFile):
                     if name.endswith('.dylib') and name != 'libqquickwidget.dylib':
                         path = os.path.join(dirpath, name)
                         self.run('lipo -create ../%s/%s ../%s/%s -output %s' % (self.install_x86_dir, path, self.install_arm_dir, path, path))
+                        self.run('codesign --sign - %s' % path)
 
         for f in [
             'moc',
