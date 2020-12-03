@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '4'
+    package_version = '5'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -96,7 +96,7 @@ class QtConan(ConanFile):
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11 -stdlib=libc++')
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_LFLAGS_CXX11      =',
-                                  'QMAKE_LFLAGS_CXX11      = -stdlib=libc++')
+                                  'QMAKE_LFLAGS_CXX11      = -stdlib=libc++ -Wl,-macos_version_min,10.11')
 
             with open('mkspecs/common/clang.conf', 'a') as f:
                 f.write('QMAKE_CFLAGS_RELEASE   = -Oz\n')
