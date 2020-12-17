@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '5'
+    package_version = '6'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -116,6 +116,8 @@ class QtConan(ConanFile):
             -release \
             -optimize-size \
             -strip \
+            -force-debug-info \
+            -separate-debug-info \
             -c++std c++11 \
             -no-ssse3 \
             -no-sse4.1 \
@@ -303,6 +305,12 @@ class QtConan(ConanFile):
                         self.install_arm_dir, f, f,
                         f, f))
                     self.run('codesign --sign - %s.framework/Versions/5/%s' % (f, f))
+
+                    self.run('cp -a ../../%s/lib/%s.dSYM .' % (self.install_x86_dir, f))
+                    self.run('lipo -create ../../%s/lib/%s.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.dSYM/Contents/Resources/DWARF/%s -output %s.dSYM/Contents/Resources/DWARF/%s' % (
+                        self.install_x86_dir, f, f,
+                        self.install_arm_dir, f, f,
+                        f, f))
 
             self.run('cp -a ../%s/plugins ../%s/qml .' % (self.install_x86_dir, self.install_x86_dir))
             for dirpath, dirnames, files in os.walk('.'):
