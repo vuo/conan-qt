@@ -1,0 +1,13 @@
+--- a/src/macextras/qmactoolbardelegate.mm	2018-11-16 07:37:44.000000000 -0500
++++ b/src/macextras/qmactoolbardelegate.mm	2020-12-17 11:34:14.000000000 -0500
+@@ -91,9 +91,7 @@
+ - (NSArray *)toolbarSelectableItemIdentifiers: (NSToolbar *)toolbar
+ {
+     Q_UNUSED(toolbar);
+-    NSMutableArray *array = toolbarPrivate->getItemIdentifiers(toolbarPrivate->items, true);
+-    [array addObjectsFromArray:toolbarPrivate->getItemIdentifiers(toolbarPrivate->allowedItems, true)];
+-    return array;
++    return [NSArray new];
+ }
+ 
+ - (IBAction)itemClicked:(id)sender

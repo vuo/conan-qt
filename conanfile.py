@@ -106,6 +106,10 @@ class QtConan(ConanFile):
             shutil.copytree('mkspecs/macx-clang', 'mkspecs/macx-arm64-clang')
             tools.replace_in_file('mkspecs/macx-arm64-clang/qmake.conf', 'QMAKE_APPLE_DEVICE_ARCHS = x86_64', 'QMAKE_APPLE_DEVICE_ARCHS = arm64')
 
+        with tools.chdir('%s/qtmacextras' % self.source_dir):
+            # https://b33p.net/kosada/vuo/vuo/-/issues/17856
+            self.run('patch -p1 < ../../qtmacextras-toolbar-crash.patch')
+
         self.run('mv %s/LICENSE.LGPLv3 %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
         self.run('mv %s/LGPL_EXCEPTION.txt %s/%s-lgpl-exception.txt' % (self.source_dir, self.source_dir, self.name))
 
