@@ -310,8 +310,8 @@ class QtConan(ConanFile):
                         f, f))
                     self.run('codesign --sign - %s.framework/Versions/5/%s' % (f, f))
 
-                    self.run('cp -a ../../%s/lib/%s.dSYM .' % (self.install_x86_dir, f))
-                    self.run('lipo -create ../../%s/lib/%s.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.dSYM/Contents/Resources/DWARF/%s -output %s.dSYM/Contents/Resources/DWARF/%s' % (
+                    self.run('cp -a ../../%s/lib/%s.framework.dSYM .' % (self.install_x86_dir, f))
+                    self.run('lipo -create ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s -output %s.framework.dSYM/Contents/Resources/DWARF/%s' % (
                         self.install_x86_dir, f, f,
                         self.install_arm_dir, f, f,
                         f, f))
