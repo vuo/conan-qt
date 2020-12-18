@@ -310,11 +310,13 @@ class QtConan(ConanFile):
                         f, f))
                     self.run('codesign --sign - %s.framework/Versions/5/%s' % (f, f))
 
-                    self.run('cp -a ../../%s/lib/%s.framework.dSYM .' % (self.install_x86_dir, f))
-                    self.run('lipo -create ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s -output %s.framework.dSYM/Contents/Resources/DWARF/%s' % (
-                        self.install_x86_dir, f, f,
-                        self.install_arm_dir, f, f,
-                        f, f))
+                    # @todo move the huge dSYMs to a separate package
+                    # https://docs.conan.io/en/latest/creating_packages/package_approaches.html#n-configs-1-build-n-packages
+                    # self.run('cp -a ../../%s/lib/%s.framework.dSYM .' % (self.install_x86_dir, f))
+                    # self.run('lipo -create ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s -output %s.framework.dSYM/Contents/Resources/DWARF/%s' % (
+                    #     self.install_x86_dir, f, f,
+                    #     self.install_arm_dir, f, f,
+                    #     f, f))
 
             self.run('cp -a ../%s/plugins ../%s/qml .' % (self.install_x86_dir, self.install_x86_dir))
             for dirpath, dirnames, files in os.walk('.'):
