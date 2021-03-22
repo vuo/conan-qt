@@ -1,0 +1,86 @@
+From 8961493b4036af018842820238c4eda0c0717e64 Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Fri, 11 Jan 2019 10:37:46 +0100
+Subject: [PATCH] QMacStyle - take into account that native controls are
+ transparent now
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We use NSButton to emulate tabs in QTabWidget. Starting from 10.14
+in dark theme those button objects tend to be somewhat transparent,
+thus widget's frame is visible through tab buttons. This is true for
+native controls also - NSButton, NSSegmentedControl, NSTabView - they
+all show the similar behavior. The only difference is NSTabView, which
+is the closest control to our QTabWidget - tab buttons are transparent,
+but they (AppKit) it would appear just do not draw the frame under
+this area. Let's do the same, but using clipping.
+
+Task-number: QTBUG-71741
+Change-Id: I9f19014d0db5f36bacf76ee0068fae6eee793c0f
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+---
+ src/plugins/styles/mac/qmacstyle_mac.mm | 29 +++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index b84448d5e2c..c2b6fbfeadc 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -130,6 +130,7 @@
+ #include <QtWidgets/qgraphicsview.h>
+ #endif
+ #include <QtCore/qvariant.h>
++#include <QtCore/qvarlengtharray.h>
+ #include <private/qstylehelper_p.h>
+ #include <private/qstyleanimation_p.h>
+ #include <qpa/qplatformfontdatabase.h>
+@@ -314,6 +315,26 @@ static QLinearGradient titlebarGradientInactive()
+     return qt_mac_applicationIsInDarkMode() ? darkGradient : lightGradient;
+ }
+ 
++static void clipTabBarFrame(const QStyleOption *option, const QMacStyle *style, CGContextRef ctx)
++{
++    Q_ASSERT(option);
++    Q_ASSERT(style);
++    Q_ASSERT(ctx);
++
++    if (qt_mac_applicationIsInDarkMode()) {
++        QTabWidget *tabWidget = qobject_cast<QTabWidget *>(option->styleObject);
++        Q_ASSERT(tabWidget);
++
++        const QRect tabBarRect = style->subElementRect(QStyle::SE_TabWidgetTabBar, option, tabWidget).adjusted(2, 2, -3, -2);
++        const QRegion clipPath = QRegion(option->rect) - tabBarRect;
++        QVarLengthArray<CGRect, 3> cgRects;
++        for (const QRect &qtRect : clipPath)
++            cgRects.push_back(qtRect.toCGRect());
++        if (cgRects.size())
++            CGContextClipToRects(ctx, &cgRects[0], size_t(cgRects.size()));
++    }
++}
++
+ static const QColor titlebarSeparatorLineActive(111, 111, 111);
+ static const QColor titlebarSeparatorLineInactive(131, 131, 131);
+ static const QColor darkModeSeparatorLine(88, 88, 88);
+@@ -2976,6 +2997,8 @@ const QPen arrowPen(opt->palette.text(), penWidth,
+         // QDarkNSBox, of type NSBoxCustom. Its appearance is close enough to the real thing so
+         // we can use this for now.
+         d->drawNSViewInRect(box, opt->rect, p, ^(CGContextRef ctx, const CGRect &rect) {
++            if (QTabWidget *tabWidget = qobject_cast<QTabWidget *>(opt->styleObject))
++                clipTabBarFrame(opt, this, ctx);
+             CGContextTranslateCTM(ctx, 0, rect.origin.y + rect.size.height);
+             CGContextScaleCTM(ctx, 1, -1);
+             if (QOperatingSystemVersion::current() < QOperatingSystemVersion::MacOSMojave
+@@ -3699,6 +3722,12 @@ static QPixmap darkenPixmap(const QPixmap &pixmap)
+             // inFrame:withView:], -[drawRect:] or anything in between. Besides,
+             // there's no public API do draw the pressed state, AFAICS. We'll use
+             // a push NSButton instead and clip the CGContext.
++            // NOTE/TODO: this is not true. On 10.13 NSSegmentedControl works with
++            // some (black?) magic/magic dances, on 10.14 it simply works (was
++            // it fixed in AppKit?). But, indeed, we cannot make a tab 'pressed'
++            // with NSSegmentedControl (only selected), so we stay with buttons
++            // (mixing buttons and NSSegmentedControl for such a simple thing
++            // is too much work).
+ 
+             const auto cs = d->effectiveAquaSizeConstrain(opt, w);
+             // Extra hacks to get the proper pressed appreance when not selected or selected and inactive

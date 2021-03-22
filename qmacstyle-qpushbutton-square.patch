@@ -1,0 +1,36 @@
+From 0b4ab214db5f0368b33d4cfdfcaadf137070b7a8 Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Thu, 18 Oct 2018 16:26:59 +0200
+Subject: [PATCH] Fix a regression in qmacstyle
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+square/flat button had an erroneous size adjustment, resulting in a
+wrong highlighted area. This button is anyway nothing like a real
+control on macOS - they don't have 'flat' button which highlights
+when pressed. Anyway, now our flat button looks more like AppKit's
+'square' button when pressed.
+
+Task-number: QTBUG-69533
+Change-Id: I9643c1d4a25329c3f3c2148cc1821922655d9a8b
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+---
+ src/plugins/styles/mac/qmacstyle_mac.mm | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index 2a216730544..1aab0309c92 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -1468,8 +1468,8 @@ uint qHash(const QMacStylePrivate::CocoaControl &cw, uint seed = 0)
+     QRectF frameRect;
+     const auto frameSize = defaultFrameSize();
+     if (type == QMacStylePrivate::Button_SquareButton) {
+-        frameRect = rect.adjusted(3, 1, -3, -5)
+-                .adjusted(focusRingWidth, focusRingWidth, -focusRingWidth, -focusRingWidth);
++        frameRect = rect.adjusted(3, 1, -3, -1)
++                        .adjusted(focusRingWidth, focusRingWidth, -focusRingWidth, -focusRingWidth);
+     } else if (type == QMacStylePrivate::Button_PushButton) {
+         // Start from the style option's top-left corner.
+         frameRect = QRectF(rect.topLeft(),

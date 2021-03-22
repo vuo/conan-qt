@@ -1,0 +1,102 @@
+From 4d6832d03f31b513ff2e3517197691bedddaccdf Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Mon, 02 Nov 2020 17:44:52 +0100
+Subject: [PATCH] QMacStyle: fix tab widget rendering
+
+This patch-set combines two recent patches for Big Sur (hiding 'disclose'
+button on a NSPopUpButton) and adjusting for (now) visible button's round
+corners. Since it makes little sense to only partially fix the thing, we
+also backport another change (not so recent, missed 5.12 in the past) that
+corrects clipping (where we are trying to cut NSBox'es frame, which otherwise
+is semi-visible through semi-transparent buttons in the 'Dark' theme).
+
+Task-number: QTBUG-86513
+Change-Id: Ieea5a47ba3073eb564594039895cf70a0a34e7be
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+---
+
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index 5e122c0..cdc7554 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -307,7 +320,19 @@
+         QTabWidget *tabWidget = qobject_cast<QTabWidget *>(option->styleObject);
+         Q_ASSERT(tabWidget);
+ 
+-        const QRect tabBarRect = style->subElementRect(QStyle::SE_TabWidgetTabBar, option, tabWidget).adjusted(2, 2, -3, -2);
++        QRect tabBarRect = style->subElementRect(QStyle::SE_TabWidgetTabBar, option, tabWidget).adjusted(2, 0, -3, 0);
++        switch (tabWidget->tabPosition()) {
++        case QTabWidget::South:
++            tabBarRect.setY(tabBarRect.y() + tabBarRect.height() / 2);
++            break;
++        case QTabWidget::North:
++        case QTabWidget::West:
++            tabBarRect = tabBarRect.adjusted(0, 2, 0, -2);
++            break;
++        case QTabWidget::East:
++            tabBarRect = tabBarRect.adjusted(tabBarRect.width() / 2, 2, tabBarRect.width() / 2, -2);
++        }
++
+         const QRegion clipPath = QRegion(option->rect) - tabBarRect;
+         QVarLengthArray<CGRect, 3> cgRects;
+         for (const QRect &qtRect : clipPath)
+@@ -3889,6 +3915,7 @@
+             const auto cs = d->effectiveAquaSizeConstrain(opt, w);
+             // Extra hacks to get the proper pressed appreance when not selected or selected and inactive
+             const bool needsInactiveHack = (!isActive && isSelected);
++            const bool isBigSurOrAbove = QOperatingSystemVersion::current() >= QOperatingSystemVersion::MacOSBigSur;
+             const auto ct = !needsInactiveHack && (isSelected || tp == QStyleOptionTab::OnlyOneTab) ?
+                     QMacStylePrivate::Button_PushButton :
+                     QMacStylePrivate::Button_PopupButton;
+@@ -3897,6 +3924,13 @@
+             auto *pb = static_cast<NSButton *>(d->cocoaControl(cw));
+ 
+             auto vOffset = isPopupButton ? 1 : 2;
++            if (isBigSurOrAbove) {
++                // Make it 1, otherwise, the offset is very visible compared
++                // to the selected tab (which is not a popup button, but a
++                // simple NSButton).
++                vOffset = 1;
++            }
++
+             if (tabDirection == QMacStylePrivate::East)
+                 vOffset -= 1;
+             const auto outerAdjust = isPopupButton ? 1 : 4;
+@@ -3965,7 +4018,35 @@
+                     CGContextRotateCTM(ctx, M_PI_2);
+                 }
+ 
+-                [pb.cell drawBezelWithFrame:r inView:pb.superview];
++                // Now, if it's a trick with a popup button, it has an arrow
++                // which makes no sense on tabs.
++                NSPopUpArrowPosition oldPosition = NSPopUpArrowAtCenter;
++                NSPopUpButtonCell *pbCell = nil;
++                auto rAdjusted = r;
++                if (isPopupButton && (tp == QStyleOptionTab::OnlyOneTab || isBigSurOrAbove)) {
++                    // Note: starting from macOS BigSur NSPopupButton has this
++                    // arrow 'button' in a different place and it became
++                    // quite visible 'in between' inactive tabs.
++                    pbCell = static_cast<NSPopUpButtonCell *>(pb.cell);
++                    oldPosition = pbCell.arrowPosition;
++                    pbCell.arrowPosition = NSPopUpNoArrow;
++                    if (pb.state == NSControlStateValueOff) {
++                        // NSPopUpButton in this state is smaller.
++                        rAdjusted.origin.x -= 3;
++                        rAdjusted.size.width += 6;
++                        if (isBigSurOrAbove) {
++                            rAdjusted.origin.y -= 1;
++                            rAdjusted.size.height += 1;
++                            if (tp == QStyleOptionTab::End)
++                                rAdjusted.origin.x -= 2;
++                        }
++                    }
++                }
++
++                [pb.cell drawBezelWithFrame:rAdjusted inView:pb.superview];
++
++                if (pbCell) // Restore, we may reuse it for a ComboBox.
++                    pbCell.arrowPosition = oldPosition;
+             };
+ 
+             if (needsInactiveHack) {
