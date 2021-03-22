@@ -45,7 +45,7 @@ index b84448d5e2c..c2b6fbfeadc 100644
 +    Q_ASSERT(style);
 +    Q_ASSERT(ctx);
 +
-+    if (qt_mac_applicationIsInDarkMode()) {
++    if (0/*qt_mac_applicationIsInDarkMode()*/) {
 +        QTabWidget *tabWidget = qobject_cast<QTabWidget *>(option->styleObject);
 +        Q_ASSERT(tabWidget);
 +

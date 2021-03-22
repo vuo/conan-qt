@@ -1,0 +1,78 @@
+From 662798d785c309a343c13648cb018c7f556757a9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Mon, 29 Jul 2019 16:40:08 +0200
+Subject: [PATCH] macOS: Add system detection and version defines for macOS
+ Catalina (10.15)
+
+Change-Id: I127efe752ebb70825f1b31f0d64c4293d1c71820
+Reviewed-by: Simon Hausmann <simon.hausmann@qt.io>
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+---
+ src/corelib/global/qoperatingsystemversion.cpp |  8 ++++++++
+ src/corelib/global/qoperatingsystemversion.h   |  1 +
+ src/corelib/global/qsystemdetection.h          | 14 ++++++++++----
+ 3 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/src/corelib/global/qoperatingsystemversion.cpp b/src/corelib/global/qoperatingsystemversion.cpp
+index 94dc261b417..bc6adb54dc3 100644
+--- a/src/corelib/global/qoperatingsystemversion.cpp
++++ b/src/corelib/global/qoperatingsystemversion.cpp
+@@ -437,6 +437,14 @@ const QOperatingSystemVersion QOperatingSystemVersion::MacOSHighSierra =
+ const QOperatingSystemVersion QOperatingSystemVersion::MacOSMojave =
+     QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 10, 14);
+ 
++/*!
++    \variable QOperatingSystemVersion::MacOSCatalina
++    \brief a version corresponding to macOS Catalina (version 10.15).
++    \since 5.12.5
++ */
++const QOperatingSystemVersion QOperatingSystemVersion::MacOSCatalina =
++    QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 10, 15);
++
+ /*!
+     \variable QOperatingSystemVersion::AndroidJellyBean
+     \brief a version corresponding to Android Jelly Bean (version 4.1, API level 16).
+diff --git a/src/corelib/global/qoperatingsystemversion.h b/src/corelib/global/qoperatingsystemversion.h
+index df01e5438a9..89c60c49607 100644
+--- a/src/corelib/global/qoperatingsystemversion.h
++++ b/src/corelib/global/qoperatingsystemversion.h
+@@ -71,6 +71,7 @@ class Q_CORE_EXPORT QOperatingSystemVersion
+     static const QOperatingSystemVersion MacOSSierra;
+     static const QOperatingSystemVersion MacOSHighSierra;
+     static const QOperatingSystemVersion MacOSMojave;
++    static const QOperatingSystemVersion MacOSCatalina;
+ 
+     static const QOperatingSystemVersion AndroidJellyBean;
+     static const QOperatingSystemVersion AndroidJellyBean_MR1;
+diff --git a/src/corelib/global/qsystemdetection.h b/src/corelib/global/qsystemdetection.h
+index a2e51fa3300..3e38e6790be 100644
+--- a/src/corelib/global/qsystemdetection.h
++++ b/src/corelib/global/qsystemdetection.h
+@@ -231,17 +231,23 @@
+ #  if !defined(__MAC_10_14)
+ #       define __MAC_10_14 101400
+ #  endif
++#  if !defined(__MAC_10_15)
++#       define __MAC_10_15 101500
++#  endif
+ #  if !defined(MAC_OS_X_VERSION_10_11)
+-#       define MAC_OS_X_VERSION_10_11 101100
++#       define MAC_OS_X_VERSION_10_11 __MAC_10_11
+ #  endif
+ #  if !defined(MAC_OS_X_VERSION_10_12)
+-#       define MAC_OS_X_VERSION_10_12 101200
++#       define MAC_OS_X_VERSION_10_12 __MAC_10_12
+ #  endif
+ #  if !defined(MAC_OS_X_VERSION_10_13)
+-#       define MAC_OS_X_VERSION_10_13 101300
++#       define MAC_OS_X_VERSION_10_13 __MAC_10_13
+ #  endif
+ #  if !defined(MAC_OS_X_VERSION_10_14)
+-#       define MAC_OS_X_VERSION_10_14 101400
++#       define MAC_OS_X_VERSION_10_14 __MAC_10_14
++#  endif
++#  if !defined(MAC_OS_X_VERSION_10_15)
++#       define MAC_OS_X_VERSION_10_15 __MAC_10_15
+ #  endif
+ #
+ #  if !defined(__IPHONE_10_0)

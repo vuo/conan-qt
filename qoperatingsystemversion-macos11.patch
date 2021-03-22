@@ -1,0 +1,76 @@
+From 19d32f0a5fc8b12e03a84ab6e18845337fd3b70f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Tue, 28 Jul 2020 16:45:07 +0200
+Subject: [PATCH] Add QOperatingSystemVersion support for macOS Big Sur
+
+Pick-to: 5.15
+Pick-to: 5.12
+
+Change-Id: Ide57f675b20b08210f301da5177df45d008423c4
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+---
+ .../global/qoperatingsystemversion.cpp        | 25 ++++++
+ src/corelib/global/qoperatingsystemversion.h  |  1 +
+ src/corelib/global/qsystemdetection.h         |  6 ++
+ src/corelib/kernel/qcore_mac.mm               | 83 ++++++++++++++++++
+ src/corelib/kernel/qcore_mac_p.h              | 29 +++++++
+ src/plugins/platforms/cocoa/qcocoahelpers.h   | 29 -------
+ src/plugins/platforms/cocoa/qcocoahelpers.mm  | 85 -------------------
+ 7 files changed, 144 insertions(+), 114 deletions(-)
+
+diff --git a/src/corelib/global/qoperatingsystemversion.cpp b/src/corelib/global/qoperatingsystemversion.cpp
+index cbd9f852645..1d7ec46c110 100644
+--- a/src/corelib/global/qoperatingsystemversion.cpp
++++ b/src/corelib/global/qoperatingsystemversion.cpp
+@@ -454,6 +458,14 @@
+     QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 10, 15);
+
+ /*!
++    \variable QOperatingSystemVersion::MacOSBigSur
++    \brief a version corresponding to macOS Big Sur
++    \since 6.0
++ */
++const QOperatingSystemVersion QOperatingSystemVersion::MacOSBigSur =
++    QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 11, 0);
++
++/*!
+     \variable QOperatingSystemVersion::AndroidJellyBean
+     \brief a version corresponding to Android Jelly Bean (version 4.1, API level 16).
+     \since 5.9
+diff --git a/src/corelib/global/qoperatingsystemversion.h b/src/corelib/global/qoperatingsystemversion.h
+index 60243dd898d..1a8d38400b3 100644
+--- a/src/corelib/global/qoperatingsystemversion.h
++++ b/src/corelib/global/qoperatingsystemversion.h
+@@ -72,6 +72,7 @@ class Q_CORE_EXPORT QOperatingSystemVersion
+     static const QOperatingSystemVersion MacOSHighSierra;
+     static const QOperatingSystemVersion MacOSMojave;
+     static const QOperatingSystemVersion MacOSCatalina;
++    static const QOperatingSystemVersion MacOSBigSur;
+ 
+     static const QOperatingSystemVersion AndroidJellyBean;
+     static const QOperatingSystemVersion AndroidJellyBean_MR1;
+diff --git a/src/corelib/global/qsystemdetection.h b/src/corelib/global/qsystemdetection.h
+index 11b3d8fbf01..c8f98042c9f 100644
+--- a/src/corelib/global/qsystemdetection.h
++++ b/src/corelib/global/qsystemdetection.h
+@@ -233,6 +233,9 @@
+ #  if !defined(__MAC_10_15)
+ #       define __MAC_10_15 101500
+ #  endif
++#  if !defined(__MAC_10_16)
++#       define __MAC_10_16 101600
++#  endif
+ #  if !defined(MAC_OS_X_VERSION_10_11)
+ #       define MAC_OS_X_VERSION_10_11 __MAC_10_11
+ #  endif
+@@ -248,6 +251,9 @@
+ #  if !defined(MAC_OS_X_VERSION_10_15)
+ #       define MAC_OS_X_VERSION_10_15 __MAC_10_15
+ #  endif
++#  if !defined(MAC_OS_X_VERSION_10_16)
++#       define MAC_OS_X_VERSION_10_16 __MAC_10_16
++#  endif
+ #
+ #  if !defined(__IPHONE_10_0)
+ #       define __IPHONE_10_0 100000

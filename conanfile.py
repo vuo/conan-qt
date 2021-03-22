@@ -89,6 +89,9 @@ class QtConan(ConanFile):
             self.run('patch -p1 < ../../qstylesheet-repolish-children0.patch')
             self.run('patch -p1 < ../../qstylesheet-repolish-children1.patch')
 
+            self.run('patch -p1 < ../../qoperatingsystemversion-macos10.15.patch')
+            self.run('patch -p1 < ../../qoperatingsystemversion-macos11.patch')
+
             # https://bugreports.qt.io/browse/QTBUG-89133
             # https://codereview.qt-project.org/c/qt/qtbase/+/322209
             # https://b33p.net/kosada/vuo/vuo/-/issues/17840
