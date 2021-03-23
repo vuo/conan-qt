@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '7'
+    package_version = '6'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -88,25 +88,6 @@ class QtConan(ConanFile):
             # Status: merged in Qt 5.12.6.
             self.run('patch -p1 < ../../qstylesheet-repolish-children0.patch')
             self.run('patch -p1 < ../../qstylesheet-repolish-children1.patch')
-
-            self.run('patch -p1 < ../../qoperatingsystemversion-macos10.15.patch')
-            self.run('patch -p1 < ../../qoperatingsystemversion-macos11.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-89133
-            # https://codereview.qt-project.org/c/qt/qtbase/+/322209
-            # https://b33p.net/kosada/vuo/vuo/-/issues/17840
-            # Status: merged in Qt 5.15.
-            self.run('patch -p1 < ../../qmacstyle-qpushbutton-square.patch')
-            self.run('patch -p1 < ../../qmacstyle-qpushbutton-focusring.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-86513
-            # https://codereview.qt-project.org/c/qt/qtbase/+/319212
-            # https://codereview.qt-project.org/c/qt/qtbase/+/320070
-            # https://b33p.net/kosada/vuo/vuo/-/issues/17840
-            # Status: merged in Qt 5.15.
-            self.run('patch -p1 < ../../qmacstyle-qtabwidget-roundedcorner.patch')
-            self.run('patch -p1 < ../../qmacstyle-qpushbutton-transparency0.patch')
-            self.run('patch -p1 < ../../qmacstyle-qpushbutton-transparency1.patch')
 
             tools.patch(patch_file='../../qcocoahelpers.patch')
 
