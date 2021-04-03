@@ -1,0 +1,28 @@
+From 00b6af34a4f9e82f9d713186032231d512de5e00 Mon Sep 17 00:00:00 2001
+From: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+Date: Fri, 10 Jul 2020 18:37:29 +0200
+Subject: [PATCH] Disable PCRE2 JIT on macOS ARM64
+
+It's already disabled for many other ARM platforms, and upstream
+support for Apple Silicon is still pending, so we disable it for
+now. See: https://bugs.exim.org/show_bug.cgi?id=2618
+
+Fixes: QTBUG-85528
+Change-Id: I42b6e5efaa07c9b832cd05a47436eb86a214e9bf
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 2f8df4d1a87df9dd67913b016171dac20839d16e)
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+---
+
+diff --git a/src/3rdparty/pcre2/pcre2.pro b/src/3rdparty/pcre2/pcre2.pro
+index 56790f3..d89ebaa 100644
+--- a/src/3rdparty/pcre2/pcre2.pro
++++ b/src/3rdparty/pcre2/pcre2.pro
+@@ -18,6 +18,7 @@
+ uikit|qnx|winrt: DEFINES += PCRE2_DISABLE_JIT
+ win32:contains(QT_ARCH, "arm"): DEFINES += PCRE2_DISABLE_JIT
+ win32:contains(QT_ARCH, "arm64"): DEFINES += PCRE2_DISABLE_JIT
++macos:contains(QT_ARCH, "arm64"): DEFINES += PCRE2_DISABLE_JIT
+ 
+ SOURCES += \
+     $$PWD/src/pcre2_auto_possess.c \

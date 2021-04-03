@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '6'
+    package_version = '8'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -88,6 +88,12 @@ class QtConan(ConanFile):
             # Status: merged in Qt 5.12.6.
             self.run('patch -p1 < ../../qstylesheet-repolish-children0.patch')
             self.run('patch -p1 < ../../qstylesheet-repolish-children1.patch')
+
+            # https://bugreports.qt.io/browse/QTBUG-85528
+            # https://b33p.net/kosada/vuo/vuo/-/issues/18182
+            # https://b33p.net/kosada/vuo/vuo/-/issues/18203
+            # Status: merged in Qt 5.12.10.
+            self.run('patch -p1 < ../../qregularexpression-arm64-disable-jit.patch')
 
             tools.patch(patch_file='../../qcocoahelpers.patch')
 
