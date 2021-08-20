@@ -10,12 +10,12 @@ class QtConan(ConanFile):
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
-        'llvm/5.0.2-1@vuo/stable',
-        'macos-sdk/11.0-0@vuo/stable',
+        'llvm/5.0.2-5@vuo+conan+llvm/stable',
+        'macos-sdk/11.0-0@vuo+conan+macos-sdk/stable',
     )
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://qt.io/'
-    license = 'http://doc.qt.io/qt-5/opensourcelicense.html'
+    license = 'https://doc.qt.io/qt-5/licensing.html'
     description = 'Cross-platform application framework'
     source_dir = 'qt-everywhere-src-%s' % source_version
 
