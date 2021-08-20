@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.11.3'
-    package_version = '8'
+    package_version = '9'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -304,6 +304,7 @@ class QtConan(ConanFile):
                     'QtPrintSupport',
                     'QtQml',
                     'QtQuick',
+                    'QtQuickWidgets',
                     'QtSvg',
                     'QtTest',
                     'QtWidgets',

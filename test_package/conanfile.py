@@ -54,6 +54,7 @@ class QtTestConan(ConanFile):
             'PrintSupport',
             'Qml',
             'Quick',
+            'QuickWidgets',
             'Svg',
             'Test',
             'Widgets',
