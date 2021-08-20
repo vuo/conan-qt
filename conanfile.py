@@ -198,7 +198,7 @@ class QtConan(ConanFile):
 
         if platform.system() == 'Darwin':
             configure_command += '\
-                -sdk macosx11.0 \
+                -sdk macosx11.1 \
                 -no-xcb \
                 -no-dbus \
                 -style-mac \
