@@ -67,7 +67,7 @@ class QtConan(ConanFile):
             # https://b33p.net/kosada/node/14521
             self.run('patch -p1 < ../../qcocoaeventdispatcher-enable-gestures.patch')
 
-            tools.patch(patch_file='../../qcocoahelpers.patch')
+            self.run('patch -p0 < ../../qcocoahelpers.patch')
 
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11',
