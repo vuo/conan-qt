@@ -1,0 +1,10 @@
+--- mkspecs/macx-arm64-clang/qmake.conf.orig	2021-05-18 02:43:52.000000000 -0400
++++ mkspecs/macx-arm64-clang/qmake.conf	2021-09-13 21:48:24.000000000 -0400
+@@ -29,4 +29,7 @@
+ include(../common/clang.conf)
+ include(../common/clang-mac.conf)
+ 
++# Override the architecture set in ../common/macx.conf
++QMAKE_APPLE_DEVICE_ARCHS = arm64
++
+ load(qt_config)

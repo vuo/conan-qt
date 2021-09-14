@@ -82,7 +82,7 @@ class QtConan(ConanFile):
                 f.write('QMAKE_LFLAGS_RELEASE   = -Oz\n')
 
             shutil.copytree('mkspecs/macx-clang', 'mkspecs/macx-arm64-clang')
-            tools.replace_in_file('mkspecs/macx-arm64-clang/qmake.conf', 'QMAKE_APPLE_DEVICE_ARCHS = x86_64', 'QMAKE_APPLE_DEVICE_ARCHS = arm64')
+            self.run('patch -p0 < ../../macx-arm64-clang-qmake.patch ')
 
         with tools.chdir('%s/qtmacextras' % self.source_dir):
             # https://b33p.net/kosada/vuo/vuo/-/issues/17856
