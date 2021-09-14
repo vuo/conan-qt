@@ -32,7 +32,7 @@
 -                if (!mi->icon.isNull()) {
 +                bool hasIcon = !mi->icon.isNull();
 +                if (checkable && hasIcon) {
-+                    width += 24;
++                    sz.rwidth() += 24;
 +                } else if (hasIcon) {
                      const int pmSmall = pixelMetric(PM_SmallIconSize);
                      const QSize pmSize = mi->icon.actualSize(QSize(pmSmall, pmSmall));
