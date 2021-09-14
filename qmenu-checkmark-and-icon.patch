@@ -1,9 +1,9 @@
 --- a/src/widgets/styles/qstylesheetstyle.cpp
 +++ b/src/widgets/styles/qstylesheetstyle.cpp
-@@ -3691,11 +3691,14 @@ void QStyleSheetStyle::drawControl(ControlElement ce, const QStyleOption *opt, Q
-                         iconRule.geo->height = pixh;
-                     }
-                     QRect iconRect = positionRect(w, subRule, iconRule, PseudoElement_MenuIcon, opt->rect, opt->direction);
+@@ -3727,11 +3727,14 @@
+                         iconRect.moveLeft(iconRect.left());
+                     else
+                         iconRect.moveRight(iconRect.right());
 +                    if (checkable)
 +                        iconRect.moveLeft(iconRect.left() + 24);
                      iconRule.drawRule(p, iconRect);
@@ -16,24 +16,24 @@
                      QRenderRule subSubRule = renderRule(w, opt, PseudoElement_MenuCheckMark);
                      if (subSubRule.hasDrawable() || checked) {
                          QStyleOptionMenuItem newMi = mi;
-@@ -3705,6 +3708,8 @@ void QStyleSheetStyle::drawControl(ControlElement ce, const QStyleOption *opt, Q
-                 }
+@@ -3746,6 +3749,8 @@
  
                  QRect textRect = subRule.contentsRect(opt->rect);
+                 textRect.setLeft(textRect.left() + m->maxIconWidth);
 +                if (!mi.icon.isNull() && checkable)
 +                    textRect.setLeft(textRect.left() + 24);
                  textRect.setWidth(textRect.width() - mi.tabWidth);
-                 QStringRef s(&mi.text);
-                 p->setPen(mi.palette.buttonText().color());
-@@ -5046,6 +5051,10 @@ QSize QStyleSheetStyle::sizeFromContents(ContentsType ct, const QStyleOption *op
-                 int width = csz.width();
+                 const QRect vTextRect = visualRect(opt->direction, m->rect, textRect);
+ 
+@@ -5093,7 +5098,10 @@
                  if (mi->text.contains(QLatin1Char('\t')))
-                     width += 12; //as in QCommonStyle
-+                bool checkable = mi->checkType != QStyleOptionMenuItem::NotCheckable;
+                     sz.rwidth() += 12; //as in QCommonStyle
+                 bool checkable = mi->checkType != QStyleOptionMenuItem::NotCheckable;
+-                if (!mi->icon.isNull()) {
 +                bool hasIcon = !mi->icon.isNull();
-+                if (checkable && hasIcon)
++                if (checkable && hasIcon) {
 +                    width += 24;
-                 return subRule.boxSize(subRule.adjustSize(QSize(width, csz.height())));
-             }
-         }
-
++                } else if (hasIcon) {
+                     const int pmSmall = pixelMetric(PM_SmallIconSize);
+                     const QSize pmSize = mi->icon.actualSize(QSize(pmSmall, pmSmall));
+                     sz.rwidth() += pmSize.width() + 4;

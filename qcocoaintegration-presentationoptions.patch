@@ -18,15 +18,10 @@ right available geometry.
 Change-Id: I40d6ef2211165d53e0825173e3b6c6c17a5a954e
 Reviewed-by: Jake Petroules <jake.petroules@theqtcompany.com>
 ---
- src/plugins/platforms/cocoa/qcocoaintegration.mm | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/src/plugins/platforms/cocoa/qcocoaintegration.mm b/src/plugins/platforms/cocoa/qcocoaintegration.mm
-index 91d4b2706b..933160b2ca 100644
 --- a/src/plugins/platforms/cocoa/qcocoaintegration.mm
 +++ b/src/plugins/platforms/cocoa/qcocoaintegration.mm
-@@ -331,6 +331,15 @@ QCocoaIntegration::QCocoaIntegration(const QStringList &paramList)
-         [newDelegate setMenuLoader:qtMenuLoader];
+@@ -197,6 +197,16 @@
+         [cocoaApplication setMenu:[qtMenuLoader menu]];
      }
  
 +    // The presentation options such as whether or not the dock and/or menu bar is
@@ -38,9 +33,7 @@ index 91d4b2706b..933160b2ca 100644
 +    // by explicitly setting the presentation option to the magic 'default value',
 +    // which will resolve to an actual value and result in screen invalidation.
 +    cocoaApplication.presentationOptions = NSApplicationPresentationDefault;
++
+     m_screensObserver = QMacNotificationObserver([NSApplication sharedApplication],
+         NSApplicationDidChangeScreenParametersNotification, [&]() { updateScreens(); });
      updateScreens();
- 
-     QMacInternalPasteboardMime::initializeMimeTypes();
--- 
-cgit v1.1-6-g87c4
-

@@ -5,8 +5,8 @@ import shutil
 
 class QtConan(ConanFile):
     name = 'qt'
-    source_version = '5.11.3'
-    package_version = '9'
+    source_version = '5.12.11'
+    package_version = '0'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -30,14 +30,10 @@ class QtConan(ConanFile):
     exports_sources = '*.patch'
 
     def source(self):
-        tools.get('http://download.qt.io/new_archive/qt/5.11/%s/single/qt-everywhere-src-%s.tar.xz' % (self.source_version, self.source_version),
-            md5='02b353bfe7a40a8dc4274e1d17226d2b')
+        tools.get('https://download.qt.io/official_releases/qt/5.12/%s/single/qt-everywhere-src-%s.tar.xz' % (self.source_version, self.source_version),
+            md5='be919c12eee0800a2da8602f6ea5a0ef')
 
         with tools.chdir('%s/qtbase' % self.source_dir):
-            # https://bugreports.qt.io/browse/QTBUG-26795
-            # Status: merged in Qt 5.12.
-            self.run('patch -p1 < ../../qgraphicsscene-device-pixel-ratio.patch')
-
             # https://bugreports.qt.io/browse/QTBUG-31406
             # https://b33p.net/kosada/node/6228
             # https://vuo.org/node/111
@@ -48,11 +44,6 @@ class QtConan(ConanFile):
             # https://b33p.net/kosada/node/12358
             # Status: unresolved as of 2020.07.31.
             self.run('patch -p0 < ../../qapplication-ignore-touchbegin.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-63681
-            # https://b33p.net/kosada/node/13245
-            # Status: merged in Qt 5.12.
-            self.run('patch -p0 < ../../qwheelevent-timestamp.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-59805
             # https://b33p.net/kosada/node/13956
@@ -75,25 +66,6 @@ class QtConan(ConanFile):
 
             # https://b33p.net/kosada/node/14521
             self.run('patch -p1 < ../../qcocoaeventdispatcher-enable-gestures.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-69955
-            # https://b33p.net/kosada/node/14794
-            # Status: merged in Qt 5.12.
-            self.run('patch -p1 < ../../qcoretextfontdatabase-mojave.patch')
-
-            # Enable qsslconfiguration.h to compile with Clang 3.3.
-            self.run('patch -p0 < ../../qsslconfiguration-clang3.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-69204
-            # Status: merged in Qt 5.12.6.
-            self.run('patch -p1 < ../../qstylesheet-repolish-children0.patch')
-            self.run('patch -p1 < ../../qstylesheet-repolish-children1.patch')
-
-            # https://bugreports.qt.io/browse/QTBUG-85528
-            # https://b33p.net/kosada/vuo/vuo/-/issues/18182
-            # https://b33p.net/kosada/vuo/vuo/-/issues/18203
-            # Status: merged in Qt 5.12.10.
-            self.run('patch -p1 < ../../qregularexpression-arm64-disable-jit.patch')
 
             tools.patch(patch_file='../../qcocoahelpers.patch')
 
