@@ -142,7 +142,6 @@ class QtConan(ConanFile):
             -skip connectivity \
             -skip datavis3d \
             -skip doc \
-            -skip enginio \
             -skip gamepad \
             -skip graphicaleffects \
             -skip location \
