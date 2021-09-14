@@ -74,7 +74,7 @@ class QtConan(ConanFile):
                                   'QMAKE_CXXFLAGS_CXX11             = -std=c++11 -stdlib=libc++')
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_LFLAGS_CXX11      =',
-                                  'QMAKE_LFLAGS_CXX11      = -stdlib=libc++ -Wl,-macos_version_min,10.11')
+                                  'QMAKE_LFLAGS_CXX11      = -stdlib=libc++ -Wl,-macos_version_min,10.12')
 
             with open('mkspecs/common/clang.conf', 'a') as f:
                 f.write('QMAKE_CFLAGS_RELEASE   = -Oz\n')
