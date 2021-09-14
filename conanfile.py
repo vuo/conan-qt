@@ -82,14 +82,13 @@ class QtConan(ConanFile):
                 f.write('QMAKE_LFLAGS_RELEASE   = -Oz\n')
 
             shutil.copytree('mkspecs/macx-clang', 'mkspecs/macx-arm64-clang')
-            self.run('patch -p0 < ../../macx-arm64-clang-qmake.patch ')
+            self.run('patch -p0 < ../../macx-arm64-clang-qmake.patch')
 
         with tools.chdir('%s/qtmacextras' % self.source_dir):
             # https://b33p.net/kosada/vuo/vuo/-/issues/17856
             self.run('patch -p1 < ../../qtmacextras-toolbar-crash.patch')
 
         self.run('mv %s/LICENSE.LGPLv3 %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
-        self.run('mv %s/LGPL_EXCEPTION.txt %s/%s-lgpl-exception.txt' % (self.source_dir, self.source_dir, self.name))
 
     def build(self):
         # `-style-windows` is required for Qt Stylesheets.
