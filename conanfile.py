@@ -70,11 +70,11 @@ class QtConan(ConanFile):
             self.run('patch -p0 < ../../qcocoahelpers.patch')
 
             tools.replace_in_file('mkspecs/common/clang.conf',
-                                  'QMAKE_CXXFLAGS_CXX11             = -std=c++11',
-                                  'QMAKE_CXXFLAGS_CXX11             = -std=c++11 -stdlib=libc++')
+                                  'QMAKE_CXXFLAGS_CXX14             = -std=c++1y',
+                                  'QMAKE_CXXFLAGS_CXX14             = -std=c++1y -stdlib=libc++')
             tools.replace_in_file('mkspecs/common/clang.conf',
                                   'QMAKE_LFLAGS_CXX11      =',
-                                  'QMAKE_LFLAGS_CXX11      = -stdlib=libc++ -Wl,-macos_version_min,10.12')
+                                  'QMAKE_LFLAGS_CXX14      = -stdlib=libc++ -Wl,-macos_version_min,10.12')
 
             with open('mkspecs/common/clang.conf', 'a') as f:
                 f.write('QMAKE_CFLAGS_RELEASE   = -Oz\n')
@@ -99,7 +99,7 @@ class QtConan(ConanFile):
             -strip \
             -force-debug-info \
             -separate-debug-info \
-            -c++std c++11 \
+            -c++std c++1y \
             -no-ssse3 \
             -no-sse4.1 \
             -no-sse4.2 \
