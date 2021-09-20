@@ -20,12 +20,13 @@ class QtConan(ConanFile):
     source_dir = 'qt-everywhere-src-%s' % source_version
 
     build_x86_dir = '_build_x86'
-    build_arm_dir = '_build_arm'
-    build_arm_tools_dir = '_build_arm_tools'
+#    build_arm_dir = '_build_arm'
+#    build_arm_tools_dir = '_build_arm_tools'
     install_x86_dir = '_install_x86'
-    install_arm_dir = '_install_arm'
-    install_arm_tools_dir = '_install_arm_tools'
-    install_universal_dir = '_install_universal'
+#    install_arm_dir = '_install_arm'
+#    install_arm_tools_dir = '_install_arm_tools'
+#    install_universal_dir = '_install_universal'
+    install_universal_dir = '_install_x86'
 
     exports_sources = '*.patch'
 
@@ -81,8 +82,8 @@ class QtConan(ConanFile):
                 f.write('QMAKE_CXXFLAGS_RELEASE = -Oz\n')
                 f.write('QMAKE_LFLAGS_RELEASE   = -Oz\n')
 
-            shutil.copytree('mkspecs/macx-clang', 'mkspecs/macx-arm64-clang')
-            self.run('patch -p0 < ../../macx-arm64-clang-qmake.patch')
+#            shutil.copytree('mkspecs/macx-clang', 'mkspecs/macx-arm64-clang')
+#            self.run('patch -p0 < ../../macx-arm64-clang-qmake.patch')
 
         with tools.chdir('%s/qtmacextras' % self.source_dir):
             # https://b33p.net/kosada/vuo/vuo/-/issues/17856
@@ -94,7 +95,7 @@ class QtConan(ConanFile):
         # `-style-windows` is required for Qt Stylesheets.
         configure_command = '../%s/configure \
             -opensource -confirm-license \
-            -release \
+            -debug-and-release \
             -optimize-size \
             -strip \
             -force-debug-info \
@@ -193,115 +194,115 @@ class QtConan(ConanFile):
             self.run('make --quiet -j9')
             self.run('make --quiet install')
 
-        self.output.info("=== Build for arm64 ===")
-        tools.mkdir(self.build_arm_dir)
-        with tools.chdir(self.build_arm_dir):
-            configure_command_full = '%s -prefix %s/%s \
-                -no-qml-debug \
-                -platform macx-clang \
-                -xplatform macx-arm64-clang \
-                ' % (configure_command, build_root, self.install_arm_dir)
-            self.output.info(configure_command_full)
-            self.run(configure_command_full)
-            self.run('make --quiet -j9')
-            self.run('make --quiet install')
+#        self.output.info("=== Build for arm64 ===")
+#        tools.mkdir(self.build_arm_dir)
+#        with tools.chdir(self.build_arm_dir):
+#            configure_command_full = '%s -prefix %s/%s \
+#                -no-qml-debug \
+#                -platform macx-clang \
+#                -xplatform macx-arm64-clang \
+#                ' % (configure_command, build_root, self.install_arm_dir)
+#            self.output.info(configure_command_full)
+#            self.run(configure_command_full)
+#            self.run('make --quiet -j9')
+#            self.run('make --quiet install')
 
-        self.output.info("=== Build tools for arm64 ===")
-        # Above, Qt built some of the qttools for the host system (x86_64)
-        # since it needs to run them in order to build other Qt components.
-        # Now build the qttools for arm64.
-        tools.mkdir(self.build_arm_tools_dir)
-        with tools.chdir(self.build_arm_tools_dir):
-            configure_command_full = '%s -prefix %s/%s \
-                -platform macx-arm64-clang \
-                -xplatform macx-arm64-clang \
-                -skip declarative \
-                -skip imageformats \
-                -skip macextras \
-                -skip multimedia \
-                -skip quickcontrols \
-                -skip quickcontrols2 \
-                -skip svg \
-                ' % (configure_command, build_root, self.install_arm_tools_dir)
-            self.output.info(configure_command_full)
-            self.run(configure_command_full)
-            # Create the makefiles.
-            self.run('make --quiet -j9 qmake_all')
-            # Hack the makefiles to run the host's tools (rather than trying to run the ARM tools on X86).
-            for f in [
-                'moc',
-                'qfloat16-tables',
-                'qvkgen',
-                'rcc',
-                'uic',
-            ]:
-                self.run("find . \\( -name Makefile -or -name uic_wrapper.sh -or -name qvkgen_wrapper.sh \\) -print0 | xargs -0 perl -pi -e 's/_build_arm_tools\\/qtbase\\/bin\\/%s/_build_x86\\/qtbase\\/bin\\/%s/g;'" % (f, f))
-            # Build.
-            self.run('make --quiet -j9 module-qttools')
+#        self.output.info("=== Build tools for arm64 ===")
+#        # Above, Qt built some of the qttools for the host system (x86_64)
+#        # since it needs to run them in order to build other Qt components.
+#        # Now build the qttools for arm64.
+#        tools.mkdir(self.build_arm_tools_dir)
+#        with tools.chdir(self.build_arm_tools_dir):
+#            configure_command_full = '%s -prefix %s/%s \
+#                -platform macx-arm64-clang \
+#                -xplatform macx-arm64-clang \
+#                -skip declarative \
+#                -skip imageformats \
+#                -skip macextras \
+#                -skip multimedia \
+#                -skip quickcontrols \
+#                -skip quickcontrols2 \
+#                -skip svg \
+#                ' % (configure_command, build_root, self.install_arm_tools_dir)
+#            self.output.info(configure_command_full)
+#            self.run(configure_command_full)
+#            # Create the makefiles.
+#            self.run('make --quiet -j9 qmake_all')
+#            # Hack the makefiles to run the host's tools (rather than trying to run the ARM tools on X86).
+#            for f in [
+#                'moc',
+#                'qfloat16-tables',
+#                'qvkgen',
+#                'rcc',
+#                'uic',
+#            ]:
+#                self.run("find . \\( -name Makefile -or -name uic_wrapper.sh -or -name qvkgen_wrapper.sh \\) -print0 | xargs -0 perl -pi -e 's/_build_arm_tools\\/qtbase\\/bin\\/%s/_build_x86\\/qtbase\\/bin\\/%s/g;'" % (f, f))
+#            # Build.
+#            self.run('make --quiet -j9 module-qttools')
 
     def package(self):
-        tools.mkdir(self.install_universal_dir)
-        with tools.chdir(self.install_universal_dir):
-            tools.mkdir('bin')
-            with tools.chdir('bin'):
-                for f in [
-                    'moc',
-                    'rcc',
-                    'uic',
-                ]:
-                    self.run('lipo -create ../../%s/bin/%s ../../%s/qtbase/bin/%s -output %s' % (self.install_x86_dir, f, self.build_arm_tools_dir, f, f))
-                    self.run('codesign --sign - %s' % f)
-                for f in [
-                    'lconvert',
-                    'lrelease',
-                    'lupdate',
-                ]:
-                    self.run('lipo -create ../../%s/bin/%s ../../%s/qttools/bin/%s -output %s' % (self.install_x86_dir, f, self.build_arm_tools_dir, f, f))
-                    self.run('codesign --sign - %s' % f)
-
-            tools.mkdir('lib')
-            with tools.chdir('lib'):
-                self.run('cp -a ../../%s/lib/cmake .' % self.install_x86_dir)
-                for f in [
-                    'QtCore',
-                    'QtGui',
-                    'QtMacExtras',
-                    'QtMultimedia',
-                    'QtMultimediaQuick',
-                    'QtMultimediaWidgets',
-                    'QtNetwork',
-                    'QtOpenGL',
-                    'QtPrintSupport',
-                    'QtQml',
-                    'QtQuick',
-                    'QtQuickWidgets',
-                    'QtSvg',
-                    'QtTest',
-                    'QtWidgets',
-                    'QtXml',
-                ]:
-                    self.run('cp -a ../../%s/lib/%s.framework .' % (self.install_x86_dir, f))
-                    self.run('lipo -create ../../%s/lib/%s.framework/Versions/5/%s ../../%s/lib/%s.framework/Versions/5/%s -output %s.framework/Versions/5/%s' % (
-                        self.install_x86_dir, f, f,
-                        self.install_arm_dir, f, f,
-                        f, f))
-                    self.run('codesign --sign - %s.framework/Versions/5/%s' % (f, f))
-
-                    # @todo move the huge dSYMs to a separate package
-                    # https://docs.conan.io/en/latest/creating_packages/package_approaches.html#n-configs-1-build-n-packages
-                    # self.run('cp -a ../../%s/lib/%s.framework.dSYM .' % (self.install_x86_dir, f))
-                    # self.run('lipo -create ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s -output %s.framework.dSYM/Contents/Resources/DWARF/%s' % (
-                    #     self.install_x86_dir, f, f,
-                    #     self.install_arm_dir, f, f,
-                    #     f, f))
-
-            self.run('cp -a ../%s/plugins ../%s/qml .' % (self.install_x86_dir, self.install_x86_dir))
-            for dirpath, dirnames, files in os.walk('.'):
-                for name in files:
-                    if name.endswith('.dylib') and name != 'libqquickwidget.dylib':
-                        path = os.path.join(dirpath, name)
-                        self.run('lipo -create ../%s/%s ../%s/%s -output %s' % (self.install_x86_dir, path, self.install_arm_dir, path, path))
-                        self.run('codesign --sign - %s' % path)
+#        tools.mkdir(self.install_universal_dir)
+#        with tools.chdir(self.install_universal_dir):
+#            tools.mkdir('bin')
+#            with tools.chdir('bin'):
+#                for f in [
+#                    'moc',
+#                    'rcc',
+#                    'uic',
+#                ]:
+#                    self.run('lipo -create ../../%s/bin/%s ../../%s/qtbase/bin/%s -output %s' % (self.install_x86_dir, f, self.build_arm_tools_dir, f, f))
+#                    self.run('codesign --sign - %s' % f)
+#                for f in [
+#                    'lconvert',
+#                    'lrelease',
+#                    'lupdate',
+#                ]:
+#                    self.run('lipo -create ../../%s/bin/%s ../../%s/qttools/bin/%s -output %s' % (self.install_x86_dir, f, self.build_arm_tools_dir, f, f))
+#                    self.run('codesign --sign - %s' % f)
+#
+#            tools.mkdir('lib')
+#            with tools.chdir('lib'):
+#                self.run('cp -a ../../%s/lib/cmake .' % self.install_x86_dir)
+#                for f in [
+#                    'QtCore',
+#                    'QtGui',
+#                    'QtMacExtras',
+#                    'QtMultimedia',
+#                    'QtMultimediaQuick',
+#                    'QtMultimediaWidgets',
+#                    'QtNetwork',
+#                    'QtOpenGL',
+#                    'QtPrintSupport',
+#                    'QtQml',
+#                    'QtQuick',
+#                    'QtQuickWidgets',
+#                    'QtSvg',
+#                    'QtTest',
+#                    'QtWidgets',
+#                    'QtXml',
+#                ]:
+#                    self.run('cp -a ../../%s/lib/%s.framework .' % (self.install_x86_dir, f))
+#                    self.run('lipo -create ../../%s/lib/%s.framework/Versions/5/%s ../../%s/lib/%s.framework/Versions/5/%s -output %s.framework/Versions/5/%s' % (
+#                        self.install_x86_dir, f, f,
+#                        self.install_arm_dir, f, f,
+#                        f, f))
+#                    self.run('codesign --sign - %s.framework/Versions/5/%s' % (f, f))
+#
+#                    # @todo move the huge dSYMs to a separate package
+#                    # https://docs.conan.io/en/latest/creating_packages/package_approaches.html#n-configs-1-build-n-packages
+#                    # self.run('cp -a ../../%s/lib/%s.framework.dSYM .' % (self.install_x86_dir, f))
+#                    # self.run('lipo -create ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s ../../%s/lib/%s.framework.dSYM/Contents/Resources/DWARF/%s -output %s.framework.dSYM/Contents/Resources/DWARF/%s' % (
+#                    #     self.install_x86_dir, f, f,
+#                    #     self.install_arm_dir, f, f,
+#                    #     f, f))
+#
+#            self.run('cp -a ../%s/plugins ../%s/qml .' % (self.install_x86_dir, self.install_x86_dir))
+#            for dirpath, dirnames, files in os.walk('.'):
+#                for name in files:
+#                    if name.endswith('.dylib') and name != 'libqquickwidget.dylib':
+#                        path = os.path.join(dirpath, name)
+#                        self.run('lipo -create ../%s/%s ../%s/%s -output %s' % (self.install_x86_dir, path, self.install_arm_dir, path, path))
+#                        self.run('codesign --sign - %s' % path)
 
         for f in [
             'moc',
