@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.12.11'
-    package_version = '0'
+    package_version = '1'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -66,6 +66,11 @@ class QtConan(ConanFile):
 
             # https://b33p.net/kosada/node/14521
             self.run('patch -p1 < ../../qcocoaeventdispatcher-enable-gestures.patch')
+
+            # https://b33p.net/kosada/vuo/vuo/-/merge_requests/212#note_2150093
+            # http://bugreports.qt.io/browse/QTBUG-77427
+            # https://codereview.qt-project.org/c/qt/qtbase/+/272216
+            self.run('patch -p1 < ../../qnsview-dragging.patch')
 
             self.run('patch -p0 < ../../qcocoahelpers.patch')
 

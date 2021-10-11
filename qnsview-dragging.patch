@@ -1,0 +1,52 @@
+From 137cbd1c7200809cc3945c6d4b6deee560cdc9fc Mon Sep 17 00:00:00 2001
+From: Andy Shaw <andy.shaw@qt.io>
+Date: Thu, 29 Aug 2019 23:58:58 +0200
+Subject: [PATCH] Cocoa: Set the accepted action to be the one from the
+ response
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+
+By setting the accepted action to be the one from the response it will
+enable the user to set the drop action in their code and this will be
+reflected at the platform level.
+
+Change-Id: I7b9459b228c00ef01d91649b3405316729713164
+Fixes: QTBUG-77427
+Reviewed-by: Morten Johan SÃ¸rvig <morten.sorvig@qt.io>
+---
+ src/plugins/platforms/cocoa/qnsview_dragging.mm | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/cocoa/qnsview_dragging.mm b/src/plugins/platforms/cocoa/qnsview_dragging.mm
+index 37e972dba9e..41b96b2df67 100644
+--- a/src/plugins/platforms/cocoa/qnsview_dragging.mm
++++ b/src/plugins/platforms/cocoa/qnsview_dragging.mm
+@@ -270,6 +270,7 @@ static QPoint mapWindowCoordinates(QWindow *source, QWindow *target, QPoint poin
+         // The drag was started from within the application
+         response = QWindowSystemInterface::handleDrop(target, nativeDrag->dragMimeData(),
+                                                       point, qtAllowed, buttons, modifiers);
++        nativeDrag->setAcceptedAction(response.acceptedAction());
+     } else {
+         QCocoaDropData mimeData(sender.draggingPasteboard);
+         response = QWindowSystemInterface::handleDrop(target, &mimeData,
+@@ -282,6 +283,7 @@ static QPoint mapWindowCoordinates(QWindow *source, QWindow *target, QPoint poin
+ {
+     Q_UNUSED(session);
+     Q_UNUSED(screenPoint);
++    Q_UNUSED(operation);
+ 
+     if (!m_platformWindow)
+         return;
+@@ -290,8 +292,7 @@ static QPoint mapWindowCoordinates(QWindow *source, QWindow *target, QPoint poin
+     if (!target)
+         return;
+ 
+-    QCocoaDrag* nativeDrag = QCocoaIntegration::instance()->drag();
+-    nativeDrag->setAcceptedAction(qt_mac_mapNSDragOperation(operation));
++    QCocoaIntegration::instance()->drag();
+ 
+     // Qt starts drag-and-drop on a mouse button press event. Cococa in
+     // this case won't send the matching release event, so we have to
+-- 
+2.16.3
