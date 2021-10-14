@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.12.11'
-    package_version = '2'
+    package_version = '3'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (

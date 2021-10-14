@@ -16,16 +16,16 @@
                      QRenderRule subSubRule = renderRule(w, opt, PseudoElement_MenuCheckMark);
                      if (subSubRule.hasDrawable() || checked) {
                          QStyleOptionMenuItem newMi = mi;
-@@ -3746,6 +3749,8 @@
+@@ -3745,7 +3748,7 @@
+                 }
  
                  QRect textRect = subRule.contentsRect(opt->rect);
-                 textRect.setLeft(textRect.left() + m->maxIconWidth);
-+                if (checkable)
-+                    textRect.setLeft(textRect.left() + 24);
+-                textRect.setLeft(textRect.left() + m->maxIconWidth);
++                textRect.setLeft(textRect.left() + m->maxIconWidth + 24);
                  textRect.setWidth(textRect.width() - mi.tabWidth);
                  const QRect vTextRect = visualRect(opt->direction, m->rect, textRect);
  
-@@ -5093,7 +5098,10 @@
+@@ -5093,7 +5096,10 @@
                  if (mi->text.contains(QLatin1Char('\t')))
                      sz.rwidth() += 12; //as in QCommonStyle
                  bool checkable = mi->checkType != QStyleOptionMenuItem::NotCheckable;
@@ -37,3 +37,12 @@
                      const int pmSmall = pixelMetric(PM_SmallIconSize);
                      const QSize pmSize = mi->icon.actualSize(QSize(pmSmall, pmSmall));
                      sz.rwidth() += pmSize.width() + 4;
+@@ -5101,6 +5107,8 @@
+                     QRenderRule subSubRule = renderRule(w, opt, PseudoElement_MenuCheckMark);
+                     QRect checkmarkRect = positionRect(w, subRule, subSubRule, PseudoElement_MenuCheckMark, opt->rect, opt->direction);
+                     sz.rwidth() += std::max(mi->maxIconWidth, checkmarkRect.width()) + 4;
++                } else {
++                    sz.rwidth() += 18;
+                 }
+                 return subRule.boxSize(subRule.adjustSize(sz));
+             }
