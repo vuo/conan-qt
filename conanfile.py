@@ -6,7 +6,7 @@ import shutil
 class QtConan(ConanFile):
     name = 'qt'
     source_version = '5.12.11'
-    package_version = '1'
+    package_version = '2'
     version = '%s-%s' % (source_version, package_version)
 
     build_requires = (
@@ -50,13 +50,15 @@ class QtConan(ConanFile):
             # Status: unresolved as of 2020.07.31.
             self.run('patch -p0 < ../../qfiledialog-message.patch')
 
-            # https://b33p.net/kosada/node/10205
+            # https://b33p.net/kosada/vuo/vuo/-/issues/10205
+            # https://b33p.net/kosada/vuo/vuo/-/merge_requests/212#note_2150553
             # https://bugreports.qt.io/browse/QTBUG-66380
             # Status: merged in Qt 5.12, but reverted in 5.12.5
             # since other people want it to hide the checkmark when an icon is present.
             # The suggested workaround is to render an icon that contains the checkmark,
             # but that doesn't work for us since Qt scales down the icon to fit within 16x16,
             # so the checkmark and icon would be too small.
+            # As of Qt 6.2.0, Qt still scales down the icon to fit within 16x16.
             self.run('patch -p1 < ../../qmenu-checkmark-and-icon.patch')
 
             # https://bugreports.qt.io/browse/QTBUG-57788

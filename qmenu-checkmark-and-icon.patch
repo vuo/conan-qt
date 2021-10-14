@@ -20,7 +20,7 @@
  
                  QRect textRect = subRule.contentsRect(opt->rect);
                  textRect.setLeft(textRect.left() + m->maxIconWidth);
-+                if (!mi.icon.isNull() && checkable)
++                if (checkable)
 +                    textRect.setLeft(textRect.left() + 24);
                  textRect.setWidth(textRect.width() - mi.tabWidth);
                  const QRect vTextRect = visualRect(opt->direction, m->rect, textRect);
